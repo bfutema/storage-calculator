@@ -1,0 +1,124 @@
+.space-cats {
+  display: grid;
+  gap: 0.75rem;
+}
+
+.space-cats__head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.space-cats__head p,
+.space-cats__empty,
+.space-cats__error {
+  margin: 0.3rem 0 0;
+  font-size: 0.82rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.space-cats__error {
+  color: var(--danger);
+  margin: 0;
+}
+
+.space-cats__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.4rem;
+}
+
+.space-cats__item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.55rem 0.65rem;
+  border-radius: 12px;
+  background: rgba(22, 53, 42, 0.05);
+  border: 1px solid rgba(22, 53, 42, 0.08);
+}
+
+.space-cats__copy {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.space-cats__copy strong {
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.space-cats__copy span {
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.space-cats__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.05rem;
+  flex-shrink: 0;
+}
+
+.space-cats__edit {
+  display: grid;
+  gap: 0.45rem;
+  width: 100%;
+}
+
+.space-cats__edit input,
+.space-cats__add input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  color: var(--ink);
+}
+
+.space-cats__size-row {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.4rem;
+  max-width: 9rem;
+}
+
+.space-cats__size-row span {
+  font-size: 0.8rem;
+  color: var(--muted);
+}
+
+.space-cats__add {
+  display: grid;
+  gap: 0.55rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(22, 53, 42, 0.1);
+}
+
+.space-cats--compact .space-cats__head h3 {
+  font-size: 0.92rem;
+}
+
+.space-cats--compact .space-cats__head p {
+  font-size: 0.75rem;
+}
+
+.space-cats--compact .space-cats__item {
+  padding: 0.45rem 0.5rem;
+}
+
+.space-cats--compact .btn--primary {
+  padding: 0.65rem 1rem;
+  font-size: 0.88rem;
+}

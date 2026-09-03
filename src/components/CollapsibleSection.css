@@ -1,0 +1,114 @@
+.collapse {
+  border: 1px solid rgba(22, 53, 42, 0.12);
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.42);
+  overflow: clip;
+}
+
+.collapse__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.65rem;
+  list-style: none;
+  cursor: pointer;
+  padding: 0.7rem 0.8rem;
+  color: var(--ink);
+  font: inherit;
+  user-select: none;
+}
+
+.collapse__trigger::-webkit-details-marker {
+  display: none;
+}
+
+.collapse__trigger::marker {
+  content: '';
+}
+
+.collapse__trigger:hover {
+  background: rgba(22, 53, 42, 0.04);
+}
+
+.collapse__copy {
+  display: grid;
+  gap: 0.15rem;
+  min-width: 0;
+  flex: 1;
+}
+
+.collapse__title {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.collapse__summary {
+  font-size: 0.72rem;
+  color: var(--muted);
+  font-weight: 600;
+  line-height: 1.3;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.collapse__chevron {
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  border-radius: 8px;
+  background: rgba(22, 53, 42, 0.08);
+  position: relative;
+}
+
+.collapse__chevron::before,
+.collapse__chevron::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.55rem;
+  height: 1.5px;
+  background: var(--ink-soft);
+  border-radius: 1px;
+  transform: translate(-50%, -50%);
+}
+
+.collapse__chevron::after {
+  transform: translate(-50%, -50%) rotate(90deg);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.collapse[open] .collapse__chevron::after {
+  opacity: 0;
+  transform: translate(-50%, -50%) rotate(90deg) scaleX(0.2);
+}
+
+.collapse[open] .collapse__trigger {
+  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+}
+
+.collapse[open] .collapse__summary {
+  display: none;
+}
+
+.collapse__body {
+  padding: 0.75rem 0.8rem 0.9rem;
+}
+
+.collapse__body > .capacity,
+.collapse__body > .space-cats {
+  gap: 0.55rem;
+}
+
+.collapse__body .capacity--compact > .capacity__block > h2,
+.collapse__body .capacity--compact > .capacity__block > .capacity__note,
+.collapse__body .space-cats--compact > .space-cats__head {
+  display: none;
+}
+
+.collapse__body .gauge__legend {
+  margin: 0;
+}

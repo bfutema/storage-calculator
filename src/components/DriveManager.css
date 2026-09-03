@@ -1,0 +1,196 @@
+.drives {
+  display: grid;
+  gap: 1rem;
+}
+
+.drives__head h2,
+.drives__add h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.15rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.drives__head p {
+  margin: 0.35rem 0 0;
+  font-size: 0.9rem;
+  color: var(--muted);
+  line-height: 1.4;
+}
+
+.drives__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.65rem;
+}
+
+.drive-card {
+  display: grid;
+  gap: 0.55rem;
+  padding: 0.85rem 0.95rem;
+  border-radius: 16px;
+  border: 1.5px solid rgba(22, 53, 42, 0.1);
+  background: rgba(255, 255, 255, 0.4);
+}
+
+.drive-card.is-selected {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 16%, rgba(255, 255, 255, 0.72));
+}
+
+.drive-card.is-over {
+  border-color: color-mix(in srgb, var(--danger) 55%, transparent);
+}
+
+.drive-card__select {
+  appearance: none;
+  border: none;
+  background: transparent;
+  text-align: left;
+  padding: 0;
+  cursor: pointer;
+  display: grid;
+  gap: 0.35rem;
+  color: inherit;
+  font: inherit;
+  width: 100%;
+}
+
+.drive-card__title {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.drive-card__title strong {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.drive-badge {
+  font-style: normal;
+  font-size: 0.68rem;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  font-weight: 700;
+  padding: 0.2rem 0.45rem;
+  border-radius: 6px;
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.drive-badge--ext {
+  background: rgba(22, 53, 42, 0.12);
+  color: var(--ink-soft);
+}
+
+.drive-card__meta {
+  font-size: 0.85rem;
+  color: var(--muted);
+}
+
+.drive-card__bar {
+  display: block;
+  height: 0.35rem;
+  border-radius: 999px;
+  background: rgba(22, 53, 42, 0.1);
+  overflow: hidden;
+}
+
+.drive-card__bar i {
+  display: block;
+  height: 100%;
+  background: var(--accent);
+  border-radius: inherit;
+}
+
+.drive-card.is-over .drive-card__bar i {
+  background: var(--danger);
+}
+
+.drive-card__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.1rem;
+}
+
+.drive-card__edit {
+  display: grid;
+  gap: 0.65rem;
+}
+
+.drives__add {
+  display: grid;
+  gap: 0.75rem;
+  padding-top: 0.35rem;
+  border-top: 1px solid rgba(22, 53, 42, 0.1);
+}
+
+.drives__add-fields {
+  display: grid;
+  gap: 0.75rem;
+}
+
+@media (min-width: 640px) {
+  .drives__add-fields {
+    grid-template-columns: 1.4fr 0.8fr;
+  }
+}
+
+.drives__error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.9rem;
+}
+
+.drive-switcher {
+  display: grid;
+  gap: 0.4rem;
+  margin-bottom: 0.75rem;
+}
+
+.drive-switcher__btn {
+  appearance: none;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.45);
+  border-radius: 12px;
+  padding: 0.55rem 0.7rem;
+  text-align: left;
+  cursor: pointer;
+  display: grid;
+  gap: 0.1rem;
+  font: inherit;
+  color: var(--ink);
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.drive-switcher__btn strong {
+  font-family: var(--font-display);
+  font-size: 0.88rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.drive-switcher__btn span {
+  font-size: 0.75rem;
+  color: var(--muted);
+}
+
+.drive-switcher__btn.is-active {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 20%, rgba(255, 255, 255, 0.7));
+}
+
+.drive-switcher__btn.is-over:not(.is-active) {
+  border-color: color-mix(in srgb, var(--danger) 40%, transparent);
+}
+
+.drive-switcher__btn.is-over.is-active {
+  border-color: var(--danger);
+}

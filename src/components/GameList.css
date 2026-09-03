@@ -1,0 +1,444 @@
+.game-list {
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+}
+
+.game-list--empty {
+  padding: 0.5rem 0 0.15rem;
+  color: var(--muted);
+  font-size: 0.98rem;
+}
+
+.game-list--empty p {
+  margin: 0;
+}
+
+.game-list__sort {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.4rem;
+}
+
+.game-list__sort > span {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 0.2rem;
+}
+
+.sort-btn,
+.table-sort {
+  appearance: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  font: inherit;
+  font-weight: 600;
+  transition: background 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+.sort-btn {
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--ink-soft);
+  border-radius: 10px;
+  padding: 0.4rem 0.85rem;
+  font-size: 0.88rem;
+}
+
+.sort-btn em,
+.table-sort em {
+  font-style: normal;
+  font-size: 0.85em;
+  opacity: 0.85;
+}
+
+.sort-btn:hover {
+  border-color: rgba(22, 53, 42, 0.28);
+}
+
+.sort-btn.is-active {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--paper);
+}
+
+.table-sort {
+  border: none;
+  background: transparent;
+  padding: 0;
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.table-sort:hover,
+.table-sort.is-active {
+  color: var(--ink);
+}
+
+.game-list__items {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 0.1rem;
+}
+
+.game-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.65rem 0.75rem;
+  padding: 0.85rem 0.15rem;
+  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+  animation: row-in 0.4s ease both;
+  min-width: 0;
+}
+
+.game-row--editing {
+  align-items: stretch;
+}
+
+.game-row--skipped {
+  opacity: 0.55;
+}
+
+.game-row__count {
+  position: relative;
+  flex-shrink: 0;
+  width: 1.35rem;
+  height: 1.35rem;
+  cursor: pointer;
+}
+
+.game-row__count input {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+  margin: 0;
+  cursor: pointer;
+}
+
+.game-row__check {
+  display: block;
+  position: relative;
+  width: 1.35rem;
+  height: 1.35rem;
+  border: 1.5px solid var(--line);
+  border-radius: 6px;
+  background: rgba(255, 255, 255, 0.55);
+  transition: background 0.15s ease, border-color 0.15s ease,
+    box-shadow 0.15s ease;
+}
+
+.game-row__count input:checked + .game-row__check {
+  background: var(--ink);
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+}
+
+.game-row__count input:checked + .game-row__check::after {
+  content: '';
+  position: absolute;
+  left: 0.42rem;
+  top: 0.2rem;
+  width: 0.32rem;
+  height: 0.62rem;
+  border: solid var(--paper);
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.game-row__count input:focus-visible + .game-row__check {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.game-row__main {
+  display: grid;
+  gap: 0.15rem;
+  flex: 1 1 12rem;
+  min-width: 0;
+}
+
+.game-row__main strong {
+  font-family: var(--font-display);
+  font-size: 1.05rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.game-row__main span {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.game-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  flex: 1 1 auto;
+  justify-content: flex-end;
+  margin-left: auto;
+}
+
+.game-row__edit {
+  display: grid;
+  gap: 0.55rem;
+  width: 100%;
+}
+
+.game-row__edit input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 10px;
+  padding: 0.7rem 0.85rem;
+  font: inherit;
+  color: var(--ink);
+}
+
+.game-row__edit-size {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: center;
+  gap: 0.5rem;
+  max-width: 10rem;
+}
+
+.game-row__edit-size span {
+  color: var(--muted);
+  font-size: 0.85rem;
+}
+
+.game-row__error {
+  margin: 0;
+  color: var(--danger);
+  font-size: 0.85rem;
+}
+
+.drive-select {
+  display: block;
+  min-width: 0;
+}
+
+.drive-select select {
+  width: 100%;
+  max-width: 14rem;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.65);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.45rem 0.65rem;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.game-row .drive-select {
+  flex: 1 1 10rem;
+  min-width: 0;
+}
+
+.game-row .drive-select select {
+  max-width: none;
+  width: 100%;
+}
+
+.game-table-wrap {
+  overflow-x: auto;
+}
+
+.game-table {
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 44rem;
+}
+
+.game-table th,
+.game-table td {
+  text-align: left;
+  padding: 0.8rem 0.7rem;
+  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+  vertical-align: middle;
+}
+
+.game-table th {
+  font-size: 0.72rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  font-weight: 700;
+}
+
+.game-table tbody tr {
+  animation: row-in 0.4s ease both;
+}
+
+.game-table__check {
+  width: 4.5rem;
+}
+
+.game-table__name {
+  font-family: var(--font-display);
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.game-table__size {
+  font-variant-numeric: tabular-nums;
+  font-weight: 600;
+  color: var(--accent-ink);
+  white-space: nowrap;
+}
+
+.game-table__actions {
+  width: 1%;
+}
+
+.game-table__actions .game-row__actions {
+  margin-left: 0;
+  flex-wrap: wrap;
+  max-width: 14rem;
+}
+
+.game-table__edit-row td {
+  padding: 0.85rem 0.7rem 1rem;
+}
+
+.game-cards {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 0.85rem;
+}
+
+.game-card {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  min-width: 0;
+  margin: 0;
+  padding: 0.95rem 1rem 0.85rem;
+  background: rgba(255, 255, 255, 0.42);
+  border: 1.5px solid rgba(22, 53, 42, 0.1);
+  border-radius: 18px;
+  overflow: hidden;
+  animation: card-in 0.35s ease both;
+  transition: border-color 0.2s ease, background 0.2s ease, opacity 0.2s ease;
+}
+
+.game-card--counted {
+  border-color: var(--accent);
+  background: color-mix(in srgb, var(--accent) 22%, rgba(255, 255, 255, 0.72));
+}
+
+.game-card__top {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 0.5rem;
+  min-width: 0;
+}
+
+.game-card__status {
+  font-size: 0.68rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+  text-align: right;
+  line-height: 1.25;
+  min-width: 0;
+  flex: 1;
+}
+
+.game-card strong {
+  font-family: var(--font-display);
+  font-size: 1.02rem;
+  font-weight: 650;
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  line-height: 1.25;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.game-card__size {
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+.game-card .drive-select {
+  width: 100%;
+}
+
+.game-card .drive-select select {
+  width: 100%;
+  max-width: none;
+  box-sizing: border-box;
+  font-size: 0.82rem;
+  padding: 0.45rem 0.55rem;
+}
+
+.game-card .game-row__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  width: 100%;
+  margin-left: 0;
+}
+
+.game-card .game-row__actions .btn {
+  padding: 0.35rem 0.55rem;
+  font-size: 0.82rem;
+  border-radius: 8px;
+}
+
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+@keyframes row-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes card-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}

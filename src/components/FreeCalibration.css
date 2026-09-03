@@ -1,0 +1,101 @@
+.free-cal {
+  display: grid;
+  gap: 0.65rem;
+  padding: 0.85rem 0.9rem;
+  border-radius: 14px;
+  background: rgba(196, 135, 58, 0.1);
+  border: 1px solid rgba(196, 135, 58, 0.22);
+}
+
+.free-cal--compact {
+  padding: 0.65rem 0.7rem;
+  border-radius: 12px;
+  gap: 0.5rem;
+}
+
+.free-cal__head h3 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 0.92rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.free-cal--compact .free-cal__head h3 {
+  font-size: 0.86rem;
+}
+
+.free-cal__head p,
+.free-cal__error,
+.free-cal__status p {
+  margin: 0.25rem 0 0;
+  font-size: 0.78rem;
+  color: var(--muted);
+  line-height: 1.35;
+}
+
+.free-cal--compact .free-cal__head p {
+  font-size: 0.72rem;
+}
+
+.free-cal__head strong {
+  color: var(--ink);
+  font-weight: 700;
+}
+
+.free-cal__error {
+  color: var(--danger);
+  margin: 0;
+}
+
+.free-cal__form {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 0.45rem;
+  align-items: end;
+}
+
+.free-cal .field {
+  display: grid;
+  gap: 0.3rem;
+}
+
+.free-cal .field span {
+  font-size: 0.68rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+
+.free-cal .field input {
+  width: 100%;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.7);
+  color: var(--ink);
+  border-radius: 10px;
+  padding: 0.55rem 0.7rem;
+  font: inherit;
+  font-size: 0.9rem;
+}
+
+.free-cal .btn--primary {
+  padding: 0.55rem 0.9rem;
+  font-size: 0.86rem;
+  white-space: nowrap;
+}
+
+.free-cal__status {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+}
+
+.free-cal__status strong {
+  color: var(--ink);
+}
+
+.free-cal__status em {
+  font-style: normal;
+  color: var(--muted);
+}

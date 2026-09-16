@@ -42,7 +42,9 @@ if [[ -n "$ORIGIN_URL" ]]; then
   REPO_NAME="${tmp##*/}"
   tmp2="$tmp"
   tmp2="${tmp2%/*}"
-  OWNER_NAME="${tmp2##*/}"
+  tmp2="${tmp2##*/}"
+  # remotes SSH com alias (git@github-oeco:owner/repo.git) deixam o host antes do owner
+  OWNER_NAME="${tmp2##*:}"
 fi
 
 if [[ -z "${VITE_BASE_PATH:-}" ]]; then

@@ -11,6 +11,14 @@ yarn dev
 
 Abra o endereço do Vite no navegador. A lista de jogos e as configurações ficam salvas no `localStorage`.
 
+## Deploy (GitHub Pages)
+
+```bash
+yarn deploy
+```
+
+O script faz o build, publica a pasta `dist/` na branch `gh-pages` e empurra para o GitHub. O `base path` é detectado pelo nome do repositório. O site fica em `https://<seu-usuario>.github.io/<nome-do-repo>/`.
+
 ## O que calcula
 
 - Capacidade do SSD (presets ou valor manual)

@@ -1,3 +1,4 @@
+import { storageTypeLabel } from '../types'
 import { formatSize } from '../utils/format'
 import type { StorageBreakdown } from '../utils/format'
 import { CollapsibleSection } from './CollapsibleSection'
@@ -71,7 +72,7 @@ export function DiskGauge({ breakdown, compact = false }: DiskGaugeProps) {
       {breakdown.ssdOverheadGb > 0 ? (
         <li>
           <i className="dot dot--overhead" />
-          Overhead SSD <span>{formatSize(breakdown.ssdOverheadGb)}</span>
+          Overhead disco <span>{formatSize(breakdown.ssdOverheadGb)}</span>
         </li>
       ) : null}
     </ul>
@@ -84,6 +85,7 @@ export function DiskGauge({ breakdown, compact = false }: DiskGaugeProps) {
     >
       <p className="gauge__drive">
         {breakdown.driveName}
+        <span>{storageTypeLabel(breakdown.driveType)}</span>
         <span>{breakdown.isInternal ? 'Interno' : 'Externo'}</span>
       </p>
       <div className="gauge__ring-wrap">

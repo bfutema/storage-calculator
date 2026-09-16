@@ -11,7 +11,7 @@ import { SpaceCategories } from './components/SpaceCategories'
 import { useLibrary } from './hooks/useLibrary'
 import { useMediaQuery } from './hooks/useMediaQuery'
 import { FocusDrawer } from './layouts/FocusDrawer'
-import { getDriveById, getInternalDrive } from './types'
+import { getDriveById, getInternalDrive, storageTypeLabel } from './types'
 import {
   calculateAllBreakdowns,
   calculateBreakdown,
@@ -161,7 +161,7 @@ function App() {
       {selectedDrive ? (
         <CollapsibleSection
           key={`cap-${selectedDrive.id}`}
-          title="Capacidade do SSD"
+          title={`Capacidade do ${storageTypeLabel(selectedDrive.type)}`}
           storageKey="storage-calculator:focus-capacity-open"
           defaultOpen={false}
           summary={`${formatSize(selectedDrive.capacityGb)} → ${formatSize(breakdown.effectiveCapacityGb)}`}
@@ -183,6 +183,8 @@ function App() {
               onCapacityChange={(gb) =>
                 updateDrive(selectedDrive.id, { capacityGb: gb })
               }
+              onNameChange={(name) => updateDrive(selectedDrive.id, { name })}
+              onTypeChange={(type) => updateDrive(selectedDrive.id, { type })}
               onBufferChange={setUpdateBufferPercent}
               onUseBinaryConversionChange={setUseBinaryConversion}
               onSsdOverheadChange={setSsdOverheadPercent}
@@ -372,8 +374,8 @@ function App() {
                 breakdowns={allBreakdowns}
                 selectedDriveId={effectiveDriveId}
                 onSelect={setSelectedDriveId}
-                onAdd={(name, capacityGb) => {
-                  const id = addDrive(name, capacityGb)
+                onAdd={(name, capacityGb, type) => {
+                  const id = addDrive(name, capacityGb, type)
                   setSelectedDriveId(id)
                 }}
                 onUpdate={updateDrive}
@@ -406,6 +408,12 @@ function App() {
                     freeGb={breakdown.freeGb}
                     onCapacityChange={(gb) =>
                       updateDrive(selectedDrive.id, { capacityGb: gb })
+                    }
+                    onNameChange={(name) =>
+                      updateDrive(selectedDrive.id, { name })
+                    }
+                    onTypeChange={(type) =>
+                      updateDrive(selectedDrive.id, { type })
                     }
                     onBufferChange={setUpdateBufferPercent}
                     onUseBinaryConversionChange={setUseBinaryConversion}

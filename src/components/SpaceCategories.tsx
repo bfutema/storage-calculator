@@ -74,7 +74,7 @@ export function SpaceCategories({
       <div className="space-cats__head">
         <h3>Uso fora dos jogos</h3>
         <p>
-          Cadastre pastas e reservas reais deste SSD ({driveName}) para bater
+          Cadastre pastas e reservas reais deste armazenamento ({driveName}) para bater
           com o que o Windows mostra.
         </p>
       </div>

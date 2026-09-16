@@ -1,4 +1,11 @@
-import { CAPACITY_PRESETS, type Drive, type SpaceCategory } from '../types'
+import {
+  STORAGE_TYPES,
+  capacityPresetsFor,
+  storageTypeLabel,
+  type Drive,
+  type SpaceCategory,
+  type StorageType,
+} from '../types'
 import { formatSize, parseSizeInput } from '../utils/format'
 import { SpaceCategories } from './SpaceCategories'
 import './CapacitySetup.css'
@@ -16,6 +23,8 @@ interface CapacitySetupProps {
   usedGb?: number
   freeGb?: number
   onCapacityChange: (gb: number) => void
+  onNameChange: (name: string) => void
+  onTypeChange: (type: StorageType) => void
   onBufferChange: (percent: number) => void
   onUseBinaryConversionChange: (enabled: boolean) => void
   onSsdOverheadChange: (percent: number) => void
@@ -42,6 +51,8 @@ export function CapacitySetup({
   usedGb,
   freeGb,
   onCapacityChange,
+  onNameChange,
+  onTypeChange,
   onBufferChange,
   onUseBinaryConversionChange,
   onSsdOverheadChange,
@@ -51,7 +62,9 @@ export function CapacitySetup({
   compact = false,
   hideCategories = false,
 }: CapacitySetupProps) {
-  const customCapacity = !CAPACITY_PRESETS.some(
+  const presets = capacityPresetsFor(drive.type)
+  const typeLabel = storageTypeLabel(drive.type)
+  const customCapacity = !presets.some(
     (preset) => preset.valueGb === drive.capacityGb,
   )
   const showCategories =
@@ -63,14 +76,54 @@ export function CapacitySetup({
   return (
     <section className={compact ? 'capacity capacity--compact' : 'capacity'}>
       <div className="capacity__block">
-        <h2>{compact ? 'Capacidade do SSD' : `Capacidade · ${drive.name}`}</h2>
+        <h2>
+          {compact
+            ? `Capacidade do ${typeLabel}`
+            : `Capacidade do ${typeLabel} · ${drive.name}`}
+        </h2>
         {compact ? (
           <p className="capacity__note">
             Anunciado vs. o que o Windows mostra (ex.: 2 TB → ~1,8 TB).
           </p>
         ) : null}
+
+        <label className="field">
+          <span>Nome</span>
+          <input
+            type="text"
+            defaultValue={drive.name}
+            key={`${drive.id}-name-${drive.name}`}
+            placeholder={
+              drive.type === 'microsd' ? 'Ex.: MicroSD 512 GB' : 'Ex.: SSD interno'
+            }
+            autoComplete="off"
+            onBlur={(e) => {
+              const next = e.target.value.trim()
+              if (next && next !== drive.name) onNameChange(next)
+            }}
+            onKeyDown={(e) => {
+              if (e.key !== 'Enter') return
+              e.currentTarget.blur()
+            }}
+          />
+        </label>
+
+        <div className="capacity__presets" role="group" aria-label="Tipo">
+          {STORAGE_TYPES.map((option) => (
+            <button
+              key={option.id}
+              type="button"
+              className={`chip ${drive.type === option.id ? 'is-active' : ''}`}
+              onClick={() => onTypeChange(option.id)}
+              aria-pressed={drive.type === option.id}
+            >
+              {option.label}
+            </button>
+          ))}
+        </div>
+
         <div className="capacity__presets" role="group" aria-label="Presets">
-          {CAPACITY_PRESETS.map((preset) => (
+          {presets.map((preset) => (
             <button
               key={preset.valueGb}
               type="button"
@@ -130,7 +183,7 @@ export function CapacitySetup({
           </label>
 
           <label className="field">
-            <span>Overhead do SSD / FS (%)</span>
+            <span>Overhead do disco / FS (%)</span>
             <input
               type="text"
               inputMode="decimal"
@@ -203,8 +256,8 @@ export function CapacitySetup({
         <div className="capacity__block">
           <h2>Folga para updates</h2>
           <p className="capacity__note">
-            Percentual extra sobre o tamanho dos jogos deste SSD (patches e
-            downloads).
+            Percentual extra sobre o tamanho dos jogos deste {typeLabel}{' '}
+            (patches e downloads).
           </p>
           <label className="field">
             <span>Folga p/ updates (%)</span>

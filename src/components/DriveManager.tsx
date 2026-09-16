@@ -1,5 +1,12 @@
 import { useState, type FormEvent } from 'react'
-import { CAPACITY_PRESETS, type Drive } from '../types'
+import {
+  DEFAULT_CAPACITY_BY_TYPE,
+  STORAGE_TYPES,
+  capacityPresetsFor,
+  storageTypeLabel,
+  type Drive,
+  type StorageType,
+} from '../types'
 import { formatSize, parseSizeInput, type StorageBreakdown } from '../utils/format'
 import { EditIcon, TrashIcon } from './ActionIcons'
 import './DriveManager.css'
@@ -9,10 +16,10 @@ interface DriveManagerProps {
   breakdowns: StorageBreakdown[]
   selectedDriveId: string
   onSelect: (id: string) => void
-  onAdd: (name: string, capacityGb: number) => string | void
+  onAdd: (name: string, capacityGb: number, type: StorageType) => string | void
   onUpdate: (
     id: string,
-    patch: Partial<Pick<Drive, 'name' | 'capacityGb'>>,
+    patch: Partial<Pick<Drive, 'name' | 'type' | 'capacityGb'>>,
   ) => void
   onSetInternal: (id: string) => void
   onRemove: (id: string) => void
@@ -31,10 +38,12 @@ export function DriveManager({
   compact = false,
 }: DriveManagerProps) {
   const [name, setName] = useState('')
-  const [capacity, setCapacity] = useState('2000')
+  const [type, setType] = useState<StorageType>('ssd')
+  const [capacity, setCapacity] = useState(String(DEFAULT_CAPACITY_BY_TYPE.ssd))
   const [error, setError] = useState('')
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
+  const [editType, setEditType] = useState<StorageType>('ssd')
   const [editCapacity, setEditCapacity] = useState('')
   const [addingOpen, setAddingOpen] = useState(false)
 
@@ -44,8 +53,14 @@ export function DriveManager({
 
   function resetAddForm() {
     setName('')
-    setCapacity('2000')
+    setType('ssd')
+    setCapacity(String(DEFAULT_CAPACITY_BY_TYPE.ssd))
     setError('')
+  }
+
+  function changeType(next: StorageType) {
+    setType(next)
+    setCapacity(String(DEFAULT_CAPACITY_BY_TYPE[next]))
   }
 
   function handleAdd(event: FormEvent) {
@@ -53,14 +68,14 @@ export function DriveManager({
     const trimmed = name.trim()
     const capacityGb = parseSizeInput(capacity, 'GB')
     if (!trimmed) {
-      setError('Informe um nome para o SSD.')
+      setError('Informe um nome para o armazenamento.')
       return
     }
     if (capacityGb === null || capacityGb <= 0) {
       setError('Informe uma capacidade válida.')
       return
     }
-    const id = onAdd(trimmed, capacityGb)
+    const id = onAdd(trimmed, capacityGb, type)
     if (typeof id === 'string' && id) {
       onSelect(id)
     }
@@ -71,13 +86,14 @@ export function DriveManager({
   function startEdit(drive: Drive) {
     setEditingId(drive.id)
     setEditName(drive.name)
+    setEditType(drive.type)
     setEditCapacity(String(drive.capacityGb).replace('.', ','))
   }
 
   function saveEdit(id: string) {
     const capacityGb = parseSizeInput(editCapacity, 'GB')
     if (!editName.trim() || capacityGb === null || capacityGb <= 0) return
-    onUpdate(id, { name: editName.trim(), capacityGb })
+    onUpdate(id, { name: editName.trim(), type: editType, capacityGb })
     setEditingId(null)
   }
 
@@ -86,14 +102,29 @@ export function DriveManager({
       className={compact ? 'drives__add drives__add--compact' : 'drives__add'}
       onSubmit={handleAdd}
     >
-      {compact ? null : <h3>Adicionar SSD</h3>}
+      {compact ? null : <h3>Adicionar armazenamento</h3>}
+      <div className="capacity__presets" role="group" aria-label="Tipo">
+        {STORAGE_TYPES.map((option) => (
+          <button
+            key={option.id}
+            type="button"
+            className={`chip ${type === option.id ? 'is-active' : ''}`}
+            onClick={() => changeType(option.id)}
+            aria-pressed={type === option.id}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
       <div className="drives__add-fields">
         <label className="field">
           <span>Nome</span>
           <input
             value={name}
             onChange={(e) => setName(e.target.value)}
-            placeholder="Ex.: SSD externo 2 TB"
+            placeholder={
+              type === 'microsd' ? 'Ex.: MicroSD 512 GB' : 'Ex.: SSD externo 2 TB'
+            }
             autoComplete="off"
             autoFocus={compact}
           />
@@ -104,12 +135,12 @@ export function DriveManager({
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
             inputMode="decimal"
-            placeholder="2000"
+            placeholder={String(DEFAULT_CAPACITY_BY_TYPE[type])}
           />
         </label>
       </div>
       <div className="capacity__presets" role="group" aria-label="Presets">
-        {CAPACITY_PRESETS.map((preset) => (
+        {capacityPresetsFor(type).map((preset) => (
           <button
             key={preset.valueGb}
             type="button"
@@ -135,7 +166,7 @@ export function DriveManager({
           </button>
         ) : null}
         <button type="submit" className="btn btn--primary">
-          Adicionar SSD
+          Adicionar {storageTypeLabel(type)}
         </button>
       </div>
     </form>
@@ -144,7 +175,11 @@ export function DriveManager({
   if (compact) {
     return (
       <div className="drive-switcher">
-        <div className="drive-switcher__list" role="tablist" aria-label="SSDs">
+        <div
+          className="drive-switcher__list"
+          role="tablist"
+          aria-label="Armazenamentos"
+        >
           {drives.map((drive) => {
             const stats = breakdownFor(drive.id)
             const selected = selectedDriveId === drive.id
@@ -162,10 +197,10 @@ export function DriveManager({
                 aria-selected={selected}
                 aria-label={
                   percent === null
-                    ? drive.name
-                    : `${drive.name}, ${percent}% ocupado`
+                    ? `${drive.name} (${storageTypeLabel(drive.type)})`
+                    : `${drive.name} (${storageTypeLabel(drive.type)}), ${percent}% ocupado`
                 }
-                title={drive.name}
+                title={`${drive.name} · ${storageTypeLabel(drive.type)}`}
                 onClick={() => onSelect(drive.id)}
               >
                 {selected ? (
@@ -188,8 +223,8 @@ export function DriveManager({
             }}
             aria-expanded={addingOpen}
             aria-controls="focus-add-drive"
-            aria-label="Adicionar SSD"
-            title="Adicionar SSD"
+            aria-label="Adicionar armazenamento"
+            title="Adicionar armazenamento"
           >
             <span aria-hidden="true">+</span>
           </button>
@@ -206,10 +241,10 @@ export function DriveManager({
   return (
     <section className="drives">
       <div className="drives__head">
-        <h2>Seus SSDs</h2>
+        <h2>Seus armazenamentos</h2>
         <p>
-          Marque o disco interno do Ally e use externos para backup. Depois
-          mova cada jogo para o SSD onde ele vai ficar.
+          Marque o disco interno do Ally e use SSDs externos ou o MicroSD do
+          slot. Depois mova cada jogo para onde ele vai ficar.
         </p>
       </div>
 
@@ -233,6 +268,19 @@ export function DriveManager({
                       onChange={(e) => setEditName(e.target.value)}
                     />
                   </label>
+                  <div className="capacity__presets" role="group" aria-label="Tipo">
+                    {STORAGE_TYPES.map((option) => (
+                      <button
+                        key={option.id}
+                        type="button"
+                        className={`chip ${editType === option.id ? 'is-active' : ''}`}
+                        onClick={() => setEditType(option.id)}
+                        aria-pressed={editType === option.id}
+                      >
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
                   <label className="field">
                     <span>Capacidade (GB)</span>
                     <input
@@ -241,6 +289,18 @@ export function DriveManager({
                       onChange={(e) => setEditCapacity(e.target.value)}
                     />
                   </label>
+                  <div className="capacity__presets" role="group" aria-label="Presets">
+                    {capacityPresetsFor(editType).map((preset) => (
+                      <button
+                        key={preset.valueGb}
+                        type="button"
+                        className={`chip ${Number(editCapacity.replace(',', '.')) === preset.valueGb ? 'is-active' : ''}`}
+                        onClick={() => setEditCapacity(String(preset.valueGb))}
+                      >
+                        {preset.label}
+                      </button>
+                    ))}
+                  </div>
                   <div className="drive-card__actions">
                     <button
                       type="button"
@@ -267,6 +327,9 @@ export function DriveManager({
                   >
                     <span className="drive-card__title">
                       <strong>{drive.name}</strong>
+                      <em className="drive-badge drive-badge--type">
+                        {storageTypeLabel(drive.type)}
+                      </em>
                       {drive.isInternal ? (
                         <em className="drive-badge">Interno</em>
                       ) : (

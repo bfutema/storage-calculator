@@ -11,6 +11,7 @@ import {
   type GameSource,
   type LibraryState,
   type SpaceCategory,
+  type StorageType,
 } from '../types'
 import { createId } from '../utils/format'
 
@@ -44,6 +45,8 @@ function normalizeDrive(value: unknown): Drive | null {
   return {
     id: drive.id,
     name: drive.name.trim() || 'SSD',
+    // Dados salvos antes do MicroSD não têm tipo.
+    type: drive.type === 'microsd' ? 'microsd' : 'ssd',
     capacityGb: drive.capacityGb,
     isInternal: Boolean(drive.isInternal),
     calibrationOffsetGb,
@@ -302,10 +305,15 @@ export function useLibrary() {
     }))
   }
 
-  function addDrive(name: string, capacityGb: number) {
+  function addDrive(
+    name: string,
+    capacityGb: number,
+    type: StorageType = 'ssd',
+  ) {
     const drive: Drive = {
       id: createId(),
-      name: name.trim() || 'SSD externo',
+      name: name.trim() || (type === 'microsd' ? 'MicroSD' : 'SSD externo'),
+      type,
       capacityGb,
       isInternal: false,
     }
@@ -316,7 +324,7 @@ export function useLibrary() {
   function updateDrive(
     id: string,
     patch: Partial<
-      Pick<Drive, 'name' | 'capacityGb' | 'calibrationOffsetGb'>
+      Pick<Drive, 'name' | 'type' | 'capacityGb' | 'calibrationOffsetGb'>
     >,
   ) {
     setState((prev) => ({
@@ -329,6 +337,7 @@ export function useLibrary() {
                 typeof patch.name === 'string'
                   ? patch.name.trim() || drive.name
                   : drive.name,
+              type: patch.type ?? drive.type,
               capacityGb:
                 typeof patch.capacityGb === 'number' && patch.capacityGb > 0
                   ? patch.capacityGb

@@ -21,7 +21,8 @@ O script faz o build, publica a pasta `dist/` na branch `gh-pages` e empurra par
 
 ## O que calcula
 
-- Capacidade do SSD (presets ou valor manual)
+- Armazenamentos do tipo SSD ou MicroSD (o Ally tem um slot de cartão)
+- Capacidade de cada armazenamento (presets por tipo ou valor manual)
 - Espaço reservado para o sistema operacional
 - Folga percentual para updates/shaders
 - Soma da biblioteca de jogos

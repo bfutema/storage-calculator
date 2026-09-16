@@ -8,6 +8,7 @@ import {
   type Drive,
   type LibraryState,
   type SizeUnit,
+  type StorageType,
 } from '../types'
 
 export function formatSize(gb: number): string {
@@ -73,6 +74,7 @@ export interface BreakdownCategory {
 export interface StorageBreakdown {
   driveId: string
   driveName: string
+  driveType: StorageType
   isInternal: boolean
   gamesGb: number
   wishlistGb: number
@@ -201,6 +203,7 @@ export function calculateDriveBreakdown(
   return {
     driveId: drive.id,
     driveName: drive.name,
+    driveType: drive.type,
     isInternal: drive.isInternal,
     gamesGb,
     wishlistGb,
@@ -241,6 +244,7 @@ export function calculateBreakdown(
     return calculateDriveBreakdown(state, {
       id: 'missing',
       name: 'SSD',
+      type: 'ssd',
       capacityGb: 0,
       isInternal: true,
     })

@@ -90,6 +90,11 @@
   color: var(--ink-soft);
 }
 
+.drive-badge--type {
+  background: color-mix(in srgb, var(--accent) 26%, rgba(255, 255, 255, 0.7));
+  color: var(--accent-ink);
+}
+
 .drive-card__meta {
   font-size: 0.85rem;
   color: var(--muted);

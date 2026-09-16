@@ -1,8 +1,12 @@
 export type SizeUnit = 'MB' | 'GB' | 'TB'
 
+/** O Ally tem o SSD interno e um slot de MicroSD. */
+export type StorageType = 'ssd' | 'microsd'
+
 export interface Drive {
   id: string
   name: string
+  type: StorageType
   capacityGb: number
   isInternal: boolean
   /**
@@ -83,11 +87,21 @@ export const CATEGORY_DOT_COLORS = [
   '#5a8f8a',
 ] as const
 
+export const STORAGE_TYPES: { id: StorageType; label: string }[] = [
+  { id: 'ssd', label: 'SSD' },
+  { id: 'microsd', label: 'MicroSD' },
+]
+
+export function storageTypeLabel(type: StorageType): string {
+  return type === 'microsd' ? 'MicroSD' : 'SSD'
+}
+
 export function createDefaultDrives(capacityGb = 2000): Drive[] {
   return [
     {
       id: DEFAULT_INTERNAL_DRIVE_ID,
       name: 'ROG Ally (interno)',
+      type: 'ssd',
       capacityGb,
       isInternal: true,
     },
@@ -131,6 +145,25 @@ export const CAPACITY_PRESETS = [
   { label: '4 TB', valueGb: 4000 },
   { label: '8 TB', valueGb: 8000 },
 ] as const
+
+export const MICROSD_CAPACITY_PRESETS = [
+  { label: '64 GB', valueGb: 64 },
+  { label: '128 GB', valueGb: 128 },
+  { label: '256 GB', valueGb: 256 },
+  { label: '512 GB', valueGb: 512 },
+  { label: '1 TB', valueGb: 1000 },
+] as const
+
+export const DEFAULT_CAPACITY_BY_TYPE: Record<StorageType, number> = {
+  ssd: 2000,
+  microsd: 512,
+}
+
+export function capacityPresetsFor(
+  type: StorageType,
+): readonly { label: string; valueGb: number }[] {
+  return type === 'microsd' ? MICROSD_CAPACITY_PRESETS : CAPACITY_PRESETS
+}
 
 /** Marketing decimal GB → approximate OS GiB (Windows "GB"). */
 export const DECIMAL_TO_BINARY = 1000 / 1024

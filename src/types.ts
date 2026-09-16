@@ -24,6 +24,8 @@ export interface Game {
   name: string
   sizeGb: number
   counted: boolean
+  /** Planned install — counts toward the assigned drive, shown in purple. */
+  wishlist: boolean
   archived: boolean
   driveId: string
   sourceId: string
@@ -65,6 +67,8 @@ export const GAME_SOURCE_COLORS = [
   '#6b8f71',
   '#5a8f8a',
 ] as const
+
+export const WISHLIST_COLOR = '#8b6cc7'
 
 export const CATEGORY_DOT_COLORS = [
   '#8aa396',

@@ -1,6 +1,8 @@
 import { useState, type FormEvent } from 'react'
 import type { Drive, Game, GameSource } from '../types'
 import { formatSize, parseSizeInput } from '../utils/format'
+import { ArchiveIcon, EditIcon, TrashIcon } from './ActionIcons'
+import { WishDriveModal } from './WishDriveModal'
 import './GameList.css'
 
 export type ViewMode = 'list' | 'table' | 'cards'
@@ -21,6 +23,7 @@ interface GameListProps {
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
+  onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
   onArchive: (id: string) => void
   onRemove: (id: string) => void
 }
@@ -39,6 +42,7 @@ export function GameList({
   onToggleCounted,
   onSetDrive,
   onSetSource,
+  onToggleWishlist,
   onArchive,
   onRemove,
 }: GameListProps) {
@@ -62,6 +66,7 @@ export function GameList({
     onToggleCounted,
     onSetDrive,
     onSetSource,
+    onToggleWishlist,
     onArchive,
     onRemove,
   }
@@ -83,8 +88,27 @@ interface ViewProps {
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
+  onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
   onArchive: (id: string) => void
   onRemove: (id: string) => void
+}
+
+function gameStatusLabel(game: Game): string {
+  if (game.wishlist) return 'Lista de desejos'
+  if (game.counted) return 'Na conta'
+  return 'Fora da conta'
+}
+
+function gameRowClass(game: Game): string {
+  if (game.wishlist) return 'game-row--wishlist'
+  if (!game.counted) return 'game-row--skipped'
+  return ''
+}
+
+function gameCardClass(game: Game): string {
+  if (game.wishlist) return 'game-card game-card--wishlist'
+  if (game.counted) return 'game-card game-card--counted'
+  return 'game-card game-row--skipped'
 }
 
 function SortButtons({
@@ -209,6 +233,7 @@ function ListView(props: ViewProps) {
     onToggleCounted,
     onSetDrive,
     onSetSource,
+    onToggleWishlist,
     onArchive,
     onRemove,
   } = props
@@ -234,6 +259,7 @@ function ListView(props: ViewProps) {
             onToggleCounted={onToggleCounted}
             onSetDrive={onSetDrive}
             onSetSource={onSetSource}
+            onToggleWishlist={onToggleWishlist}
             onArchive={onArchive}
             onRemove={onRemove}
           />
@@ -255,6 +281,7 @@ function TableView(props: ViewProps) {
     onToggleCounted,
     onSetDrive,
     onSetSource,
+    onToggleWishlist,
     onArchive,
     onRemove,
   } = props
@@ -307,6 +334,7 @@ function TableView(props: ViewProps) {
               onToggleCounted={onToggleCounted}
               onSetDrive={onSetDrive}
               onSetSource={onSetSource}
+              onToggleWishlist={onToggleWishlist}
               onArchive={onArchive}
               onRemove={onRemove}
             />
@@ -330,6 +358,7 @@ function CardsView(props: ViewProps) {
     onToggleCounted,
     onSetDrive,
     onSetSource,
+    onToggleWishlist,
     onArchive,
     onRemove,
   } = props
@@ -355,6 +384,7 @@ function CardsView(props: ViewProps) {
             onToggleCounted={onToggleCounted}
             onSetDrive={onSetDrive}
             onSetSource={onSetSource}
+            onToggleWishlist={onToggleWishlist}
             onArchive={onArchive}
             onRemove={onRemove}
           />
@@ -373,6 +403,7 @@ interface ItemProps {
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
+  onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
   onArchive: (id: string) => void
   onRemove: (id: string) => void
 }
@@ -457,6 +488,97 @@ function CountToggle({
   )
 }
 
+function WishlistStar({
+  game,
+  drives,
+  onToggleWishlist,
+}: {
+  game: Game
+  drives: Drive[]
+  onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+}) {
+  const [pickingDrive, setPickingDrive] = useState(false)
+
+  function handleClick() {
+    if (game.wishlist) {
+      onToggleWishlist(game.id, false)
+      return
+    }
+
+    if (drives.length <= 1) {
+      onToggleWishlist(game.id, true, drives[0]?.id ?? game.driveId)
+      return
+    }
+
+    setPickingDrive(true)
+  }
+
+  return (
+    <>
+      <button
+        type="button"
+        className={`game-wish ${game.wishlist ? 'is-active' : ''}`}
+        onClick={handleClick}
+        aria-pressed={game.wishlist}
+        aria-label={
+          game.wishlist
+            ? `Remover ${game.name} da lista de desejos`
+            : `Adicionar ${game.name} à lista de desejos`
+        }
+        title={game.wishlist ? 'Na lista de desejos' : 'Marcar como desejo'}
+      >
+        <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+          {game.wishlist ? (
+            <path
+              fill="currentColor"
+              d="M12 2.5l2.9 6.1 6.6.7-4.9 4.4 1.4 6.5L12 16.8l-5.9 3.4 1.4-6.5-4.9-4.4 6.6-.7L12 2.5z"
+            />
+          ) : (
+            <path
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.8"
+              strokeLinejoin="round"
+              d="M12 3.2l2.6 5.5 6 .7-4.4 4 1.2 5.9L12 16.4l-5.4 2.9 1.2-5.9-4.4-4 6-.7L12 3.2z"
+            />
+          )}
+        </svg>
+      </button>
+      <WishDriveModal
+        open={pickingDrive}
+        drives={drives}
+        defaultDriveId={game.driveId}
+        description={`Em qual SSD “${game.name}” será instalado no futuro?`}
+        onClose={() => setPickingDrive(false)}
+        onConfirm={(driveId) => onToggleWishlist(game.id, true, driveId)}
+      />
+    </>
+  )
+}
+
+function StatusToggles({
+  game,
+  drives,
+  onToggleCounted,
+  onToggleWishlist,
+}: {
+  game: Game
+  drives: Drive[]
+  onToggleCounted: (id: string, counted: boolean) => void
+  onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+}) {
+  return (
+    <div className="game-status-toggles">
+      <CountToggle game={game} onToggleCounted={onToggleCounted} />
+      <WishlistStar
+        game={game}
+        drives={drives}
+        onToggleWishlist={onToggleWishlist}
+      />
+    </div>
+  )
+}
+
 function GameEditor({
   name,
   size,
@@ -534,14 +656,32 @@ function ItemActions({
 }) {
   return (
     <div className="game-row__actions">
-      <button type="button" className="btn btn--ghost" onClick={onEdit}>
-        Editar
+      <button
+        type="button"
+        className="btn btn--ghost btn--icon"
+        onClick={onEdit}
+        aria-label="Editar"
+        title="Editar"
+      >
+        <EditIcon />
       </button>
-      <button type="button" className="btn btn--ghost" onClick={onArchive}>
-        Arquivar
+      <button
+        type="button"
+        className="btn btn--ghost btn--icon"
+        onClick={onArchive}
+        aria-label="Arquivar"
+        title="Arquivar"
+      >
+        <ArchiveIcon />
       </button>
-      <button type="button" className="btn btn--danger" onClick={onRemove}>
-        Remover
+      <button
+        type="button"
+        className="btn btn--danger btn--icon"
+        onClick={onRemove}
+        aria-label="Remover"
+        title="Remover"
+      >
+        <TrashIcon />
       </button>
     </div>
   )
@@ -556,6 +696,7 @@ function GameRow({
   onToggleCounted,
   onSetDrive,
   onSetSource,
+  onToggleWishlist,
   onArchive,
   onRemove,
 }: ItemProps) {
@@ -585,15 +726,24 @@ function GameRow({
 
   return (
     <li
-      className={`game-row ${game.counted ? '' : 'game-row--skipped'}`.trim()}
+      className={`game-row ${gameRowClass(game)}`.trim()}
       style={{ animationDelay: delay }}
     >
-      <CountToggle game={game} onToggleCounted={onToggleCounted} />
+      <StatusToggles
+        game={game}
+        drives={drives}
+        onToggleCounted={onToggleCounted}
+        onToggleWishlist={onToggleWishlist}
+      />
       <div className="game-row__main">
         <strong>{game.name}</strong>
         <span>
           {formatSize(game.sizeGb)} · {sourceName}
-          {!game.counted ? ' · fora da conta' : ''}
+          {game.wishlist
+            ? ' · desejo'
+            : !game.counted
+              ? ' · fora da conta'
+              : ''}
         </span>
       </div>
       <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
@@ -616,6 +766,7 @@ function TableRow({
   onToggleCounted,
   onSetDrive,
   onSetSource,
+  onToggleWishlist,
   onArchive,
   onRemove,
 }: ItemProps) {
@@ -644,12 +795,14 @@ function TableRow({
   }
 
   return (
-    <tr
-      className={game.counted ? undefined : 'game-row--skipped'}
-      style={{ animationDelay: delay }}
-    >
+    <tr className={gameRowClass(game) || undefined} style={{ animationDelay: delay }}>
       <td className="game-table__check">
-        <CountToggle game={game} onToggleCounted={onToggleCounted} />
+        <StatusToggles
+          game={game}
+          drives={drives}
+          onToggleCounted={onToggleCounted}
+          onToggleWishlist={onToggleWishlist}
+        />
       </td>
       <td className="game-table__name">{game.name}</td>
       <td className="game-table__size">{formatSize(game.sizeGb)}</td>
@@ -659,7 +812,7 @@ function TableRow({
       <td>
         <DriveSelect game={game} drives={drives} onSetDrive={onSetDrive} />
       </td>
-      <td>{game.counted ? 'Na conta' : 'Fora da conta'}</td>
+      <td>{gameStatusLabel(game)}</td>
       <td className="game-table__actions">
         <ItemActions
           onEdit={edit.startEdit}
@@ -680,6 +833,7 @@ function GameCard({
   onToggleCounted,
   onSetDrive,
   onSetSource,
+  onToggleWishlist,
   onArchive,
   onRemove,
 }: ItemProps) {
@@ -687,10 +841,7 @@ function GameCard({
   const delay = `${Math.min(index, 12) * 30}ms`
 
   return (
-    <li
-      className={`game-card ${game.counted ? 'game-card--counted' : 'game-row--skipped'}`.trim()}
-      style={{ animationDelay: delay }}
-    >
+    <li className={gameCardClass(game)} style={{ animationDelay: delay }}>
       {edit.editing ? (
         <GameEditor
           name={edit.name}
@@ -707,20 +858,22 @@ function GameCard({
       ) : (
         <>
           <div className="game-card__top">
-            <CountToggle game={game} onToggleCounted={onToggleCounted} />
-            <span className="game-card__status">
-              {game.counted ? 'Na conta' : 'Fora da conta'}
-            </span>
+            <StatusToggles
+              game={game}
+              drives={drives}
+              onToggleCounted={onToggleCounted}
+              onToggleWishlist={onToggleWishlist}
+            />
+            <ItemActions
+              onEdit={edit.startEdit}
+              onArchive={() => onArchive(game.id)}
+              onRemove={() => onRemove(game.id)}
+            />
           </div>
           <strong>{game.name}</strong>
           <span className="game-card__size">{formatSize(game.sizeGb)}</span>
           <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
           <DriveSelect game={game} drives={drives} onSetDrive={onSetDrive} />
-          <ItemActions
-            onEdit={edit.startEdit}
-            onArchive={() => onArchive(game.id)}
-            onRemove={() => onRemove(game.id)}
-          />
         </>
       )}
     </li>

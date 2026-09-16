@@ -112,6 +112,10 @@ function normalizeGame(
     name: game.name,
     sizeGb: game.sizeGb,
     counted: typeof game.counted === 'boolean' ? game.counted : true,
+    wishlist:
+      typeof game.wishlist === 'boolean'
+        ? game.wishlist && !(typeof game.counted === 'boolean' ? game.counted : true)
+        : false,
     archived: typeof game.archived === 'boolean' ? game.archived : false,
     driveId:
       typeof game.driveId === 'string' && game.driveId
@@ -501,6 +505,7 @@ export function useLibrary() {
         name: name.trim(),
         sizeGb,
         counted: true,
+        wishlist: false,
         archived: false,
         driveId: resolvedDriveId,
         sourceId: resolvedSourceId,
@@ -589,7 +594,13 @@ export function useLibrary() {
     setState((prev) => ({
       ...prev,
       games: prev.games.map((game) =>
-        game.id === id ? { ...game, counted } : game,
+        game.id === id
+          ? {
+              ...game,
+              counted,
+              wishlist: counted ? false : game.wishlist,
+            }
+          : game,
       ),
     }))
   }
@@ -600,7 +611,11 @@ export function useLibrary() {
       games: prev.games.map((game) =>
         game.archived || game.counted === counted
           ? game
-          : { ...game, counted },
+          : {
+              ...game,
+              counted,
+              wishlist: counted ? false : game.wishlist,
+            },
       ),
     }))
   }
@@ -611,10 +626,61 @@ export function useLibrary() {
       ...prev,
       games: prev.games.map((game) =>
         !game.archived && idSet.has(game.id) && game.counted !== counted
-          ? { ...game, counted }
+          ? {
+              ...game,
+              counted,
+              wishlist: counted ? false : game.wishlist,
+            }
           : game,
       ),
     }))
+  }
+
+  function setGameWishlist(id: string, wishlist: boolean, driveId?: string) {
+    setState((prev) => ({
+      ...prev,
+      games: prev.games.map((game) =>
+        game.id === id
+          ? {
+              ...game,
+              wishlist,
+              counted: wishlist ? false : game.counted,
+              driveId:
+                wishlist && driveId && prev.drives.some((drive) => drive.id === driveId)
+                  ? driveId
+                  : game.driveId,
+            }
+          : game,
+      ),
+    }))
+  }
+
+  function setGamesWishlist(
+    ids: string[],
+    wishlist: boolean,
+    driveId?: string,
+  ) {
+    const idSet = new Set(ids)
+    setState((prev) => {
+      const nextDriveId =
+        wishlist && driveId && prev.drives.some((drive) => drive.id === driveId)
+          ? driveId
+          : null
+
+      return {
+        ...prev,
+        games: prev.games.map((game) =>
+          !game.archived && idSet.has(game.id)
+            ? {
+                ...game,
+                wishlist,
+                counted: wishlist ? false : game.counted,
+                driveId: nextDriveId ?? game.driveId,
+              }
+            : game,
+        ),
+      }
+    })
   }
 
   function setGameArchived(id: string, archived: boolean) {
@@ -626,6 +692,7 @@ export function useLibrary() {
               ...game,
               archived,
               counted: archived ? false : game.counted,
+              wishlist: archived ? false : game.wishlist,
             }
           : game,
       ),
@@ -642,6 +709,7 @@ export function useLibrary() {
               ...game,
               archived,
               counted: archived ? false : game.counted,
+              wishlist: archived ? false : game.wishlist,
             }
           : game,
       ),
@@ -693,6 +761,8 @@ export function useLibrary() {
     setGameCounted,
     setAllGamesCounted,
     setGamesCounted,
+    setGameWishlist,
+    setGamesWishlist,
     setGameArchived,
     setGamesArchived,
     removeGame,

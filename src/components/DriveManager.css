@@ -149,42 +149,104 @@
   font-size: 0.9rem;
 }
 
+.drive-switcher__form {
+  position: absolute;
+  top: calc(100% + 0.4rem);
+  left: 0;
+  z-index: 20;
+  padding: 0.85rem;
+  border-radius: 16px;
+  border: 1px solid var(--line);
+  background: rgba(255, 255, 255, 0.94);
+  box-shadow: 0 12px 28px rgba(18, 40, 32, 0.16);
+  max-width: min(28rem, calc(100vw - 2rem));
+  width: 22rem;
+}
+
 .drive-switcher {
+  --drive-tile: 2.5rem;
+  position: relative;
   display: grid;
-  gap: 0.4rem;
-  margin-bottom: 0.75rem;
+  gap: 0.45rem;
+  min-width: 0;
+}
+
+.drive-switcher__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.35rem;
+  min-width: 0;
 }
 
 .drive-switcher__btn {
   appearance: none;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.45);
-  border-radius: 12px;
-  padding: 0.55rem 0.7rem;
-  text-align: left;
+  border: 1.5px solid var(--line);
+  background: rgba(255, 255, 255, 0.55);
+  border-radius: 10px;
   cursor: pointer;
   display: grid;
-  gap: 0.1rem;
+  place-items: center;
+  align-content: center;
+  gap: 0;
   font: inherit;
   color: var(--ink);
-  transition: border-color 0.2s ease, background 0.2s ease;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    width 0.2s ease,
+    min-width 0.2s ease;
 }
 
-.drive-switcher__btn strong {
-  font-family: var(--font-display);
-  font-size: 0.88rem;
-  font-weight: 700;
-  letter-spacing: -0.02em;
+.drive-switcher__btn.is-compact {
+  width: var(--drive-tile);
+  height: var(--drive-tile);
+  min-width: var(--drive-tile);
+  padding: 0;
+  text-align: center;
 }
 
-.drive-switcher__btn span {
-  font-size: 0.75rem;
-  color: var(--muted);
+.drive-switcher__btn.is-compact em {
+  font-style: normal;
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 650;
+  letter-spacing: 0;
+  line-height: 1;
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
 }
 
 .drive-switcher__btn.is-active {
+  width: auto;
+  min-width: 7.5rem;
+  height: var(--drive-tile);
+  padding: 0 0.65rem;
+  justify-items: start;
+  text-align: left;
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 20%, rgba(255, 255, 255, 0.7));
+  background: color-mix(in srgb, var(--accent) 22%, rgba(255, 255, 255, 0.78));
+}
+
+.drive-switcher__btn strong {
+  font-family: inherit;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0;
+  line-height: 1.15;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 9rem;
+}
+
+.drive-switcher__btn span {
+  font-family: inherit;
+  font-size: 0.68rem;
+  font-weight: 600;
+  line-height: 1.1;
+  color: var(--muted);
+  font-variant-numeric: tabular-nums;
 }
 
 .drive-switcher__btn.is-over:not(.is-active) {
@@ -193,4 +255,64 @@
 
 .drive-switcher__btn.is-over.is-active {
   border-color: var(--danger);
+}
+
+.drive-switcher__btn.is-over.is-compact em,
+.drive-switcher__btn.is-over.is-active span {
+  color: var(--danger);
+}
+
+.drive-switcher__add {
+  appearance: none;
+  box-sizing: border-box;
+  border: 1.5px dashed color-mix(in srgb, var(--ink) 28%, transparent);
+  background: rgba(255, 255, 255, 0.28);
+  border-radius: 10px;
+  width: var(--drive-tile);
+  height: var(--drive-tile);
+  min-width: var(--drive-tile);
+  padding: 0;
+  cursor: pointer;
+  display: inline-grid;
+  place-items: center;
+  font: inherit;
+  font-weight: 700;
+  color: var(--ink-soft);
+  flex: 0 0 auto;
+  transition: border-color 0.2s ease, background 0.2s ease, color 0.2s ease;
+}
+
+.drive-switcher__add > span {
+  font-size: 1rem;
+  line-height: 1;
+  font-weight: 700;
+}
+
+.drive-switcher__add:hover,
+.drive-switcher__add.is-active {
+  border-color: var(--ink);
+  border-style: dashed;
+  background: rgba(255, 255, 255, 0.55);
+  color: var(--ink);
+}
+
+.drives__add--compact {
+  border-top: none;
+  padding-top: 0;
+  gap: 0.65rem;
+}
+
+.drives__add--compact .drives__add-fields {
+  grid-template-columns: 1fr;
+}
+
+.drives__add-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.drives__add-actions .btn--primary {
+  align-self: auto;
 }

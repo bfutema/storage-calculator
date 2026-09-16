@@ -9,6 +9,8 @@
   --line: rgba(22, 53, 42, 0.16);
   --accent: #8cd650;
   --accent-ink: #2f6b2a;
+  --wishlist: #8b6cc7;
+  --wishlist-ink: #4f3a7a;
   --danger: #c44030;
 
   color: var(--ink);

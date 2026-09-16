@@ -210,18 +210,6 @@
   background: #c4873a;
 }
 
-.gauge__calibrated {
-  font-family: var(--font-body) !important;
-  font-size: 0.68rem !important;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  font-weight: 700;
-  padding: 0.2rem 0.45rem;
-  border-radius: 6px;
-  background: rgba(196, 135, 58, 0.18);
-  color: #8a5a18;
-}
-
 .gauge--compact {
   gap: 0.75rem;
   justify-items: stretch;

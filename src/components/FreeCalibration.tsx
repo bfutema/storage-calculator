@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import { formatSize, parseSizeInput } from '../utils/format'
+import { TrashIcon } from './ActionIcons'
 import './FreeCalibration.css'
 
 interface FreeCalibrationProps {
@@ -87,8 +88,14 @@ export function FreeCalibration({
                   : ' (sem diff)'}
             </em>
           </p>
-          <button type="button" className="btn btn--ghost" onClick={onClear}>
-            Remover
+          <button
+            type="button"
+            className="btn btn--ghost btn--icon"
+            onClick={onClear}
+            aria-label="Remover calibragem"
+            title="Remover calibragem"
+          >
+            <TrashIcon />
           </button>
         </div>
       ) : null}

@@ -34,6 +34,16 @@ export function DiskGauge({ breakdown, compact = false }: DiskGaugeProps) {
           Jogos <span>{formatSize(breakdown.gamesGb)}</span>
         </li>
       )}
+      {breakdown.wishlistGb > 0 ? (
+        <li>
+          <i className="dot" style={{ background: 'var(--wishlist)' }} />
+          Lista de desejos
+          {breakdown.wishlistCount > 0 ? (
+            <em className="gauge__count">{breakdown.wishlistCount}</em>
+          ) : null}
+          <span>{formatSize(breakdown.wishlistGb)}</span>
+        </li>
+      ) : null}
       <li>
         <i className="dot dot--buffer" />
         Folga updates <span>{formatSize(breakdown.bufferGb)}</span>
@@ -75,9 +85,6 @@ export function DiskGauge({ breakdown, compact = false }: DiskGaugeProps) {
       <p className="gauge__drive">
         {breakdown.driveName}
         <span>{breakdown.isInternal ? 'Interno' : 'Externo'}</span>
-        {breakdown.isCalibrated ? (
-          <span className="gauge__calibrated">Calibrado</span>
-        ) : null}
       </p>
       <div className="gauge__ring-wrap">
         <svg className="gauge__svg" viewBox="0 0 220 220" aria-hidden="true">

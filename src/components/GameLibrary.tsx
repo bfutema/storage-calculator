@@ -1,11 +1,13 @@
 import { useEffect, useMemo, useState } from 'react'
 import type { Drive, Game, GameSource } from '../types'
 import { formatSize } from '../utils/format'
+import { TrashIcon } from './ActionIcons'
 import { GameForm } from './GameForm'
 import { GameList, type SortDirection, type SortField, type ViewMode } from './GameList'
+import { WishDriveModal } from './WishDriveModal'
 import './GameLibrary.css'
 
-type StatusFilter = 'all' | 'counted' | 'skipped'
+type StatusFilter = 'all' | 'counted' | 'wishlist' | 'skipped'
 type SizeFilter = 'all' | 'small' | 'medium' | 'large' | 'huge'
 
 const VIEW_STORAGE_KEY = 'storage-calculator:view-mode'
@@ -35,6 +37,8 @@ interface GameLibraryProps {
   onSetGamesDrive: (ids: string[], driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
   onSetGamesSource: (ids: string[], sourceId: string) => void
+  onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+  onSetWishlist: (ids: string[], wishlist: boolean, driveId?: string) => void
   onAddSource: (name: string) => string | null
   onRemoveSource: (id: string) => void
   onArchive: (id: string) => void
@@ -105,6 +109,8 @@ export function GameLibrary({
   onSetGamesDrive,
   onSetSource,
   onSetGamesSource,
+  onToggleWishlist,
+  onSetWishlist,
   onAddSource,
   onRemoveSource,
   onArchive,
@@ -131,6 +137,7 @@ export function GameLibrary({
   const [newSourceName, setNewSourceName] = useState('')
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
+  const [wishDriveOpen, setWishDriveOpen] = useState(false)
 
   const activeGames = useMemo(
     () => games.filter((game) => !game.archived),
@@ -147,8 +154,11 @@ export function GameLibrary({
   )
 
   const countedGames = activeGames.filter((game) => game.counted)
+  const wishlistGames = activeGames.filter((game) => game.wishlist)
   const countedTotal = countedGames.reduce((sum, game) => sum + game.sizeGb, 0)
-  const skippedCount = activeGames.length - countedGames.length
+  const wishlistTotal = wishlistGames.reduce((sum, game) => sum + game.sizeGb, 0)
+  const skippedCount =
+    activeGames.length - countedGames.length - wishlistGames.length
   const hasActiveFilters =
     query.trim() !== '' ||
     statusFilter !== 'all' ||
@@ -168,7 +178,13 @@ export function GameLibrary({
 
     const filtered = activeGames.filter((game) => {
       if (statusFilter === 'counted' && !game.counted) return false
-      if (statusFilter === 'skipped' && game.counted) return false
+      if (statusFilter === 'wishlist' && !game.wishlist) return false
+      if (
+        statusFilter === 'skipped' &&
+        (game.counted || game.wishlist)
+      ) {
+        return false
+      }
       if (driveFilter !== 'all' && game.driveId !== driveFilter) return false
       if (sourceFilter !== 'all' && game.sourceId !== sourceFilter) return false
       if (!matchesSize(game.sizeGb, sizeFilter)) return false
@@ -335,6 +351,14 @@ export function GameLibrary({
         </button>
         <button
           type="button"
+          className={`filter-chip ${statusFilter === 'wishlist' ? 'is-active' : ''}`}
+          onClick={() => toggleStatus('wishlist')}
+          aria-pressed={statusFilter === 'wishlist'}
+        >
+          Desejos
+        </button>
+        <button
+          type="button"
           className={`filter-chip ${statusFilter === 'skipped' ? 'is-active' : ''}`}
           onClick={() => toggleStatus('skipped')}
           aria-pressed={statusFilter === 'skipped'}
@@ -394,6 +418,22 @@ export function GameLibrary({
         disabled={visibleCounted === 0}
       >
         {hasActiveFilters ? 'Desmarcar visíveis' : 'Desmarcar todos'}
+      </button>
+      <button
+        type="button"
+        className="btn btn--ghost"
+        onClick={() => {
+          if (visible.length === 0) return
+          if (drives.length <= 1) {
+            onSetWishlist(visibleIds, true, drives[0]?.id)
+            if (fillViewport) setDrawerOpen(false)
+            return
+          }
+          setWishDriveOpen(true)
+        }}
+        disabled={visible.length === 0}
+      >
+        Marcar desejo
       </button>
       <button
         type="button"
@@ -486,11 +526,13 @@ export function GameLibrary({
             <span>{source.name}</span>
             <button
               type="button"
-              className="btn btn--danger"
+              className="btn btn--danger btn--icon"
               disabled={sources.length <= 1}
               onClick={() => onRemoveSource(source.id)}
+              aria-label={`Remover origem ${source.name}`}
+              title="Remover"
             >
-              Remover
+              <TrashIcon />
             </button>
           </li>
         ))}
@@ -557,6 +599,7 @@ export function GameLibrary({
       onToggleCounted={onToggleCounted}
       onSetDrive={onSetDrive}
       onSetSource={onSetSource}
+      onToggleWishlist={onToggleWishlist}
       onArchive={onArchive}
       onRemove={onRemove}
     />
@@ -630,10 +673,12 @@ export function GameLibrary({
                         </button>
                         <button
                           type="button"
-                          className="btn btn--danger"
+                          className="btn btn--danger btn--icon"
                           onClick={() => onRemove(game.id)}
+                          aria-label={`Remover ${game.name}`}
+                          title="Remover"
                         >
-                          Remover
+                          <TrashIcon />
                         </button>
                       </div>
                     </li>
@@ -660,6 +705,9 @@ export function GameLibrary({
               {countedGames.length} de {activeGames.length}{' '}
               {activeGames.length === 1 ? 'jogo' : 'jogos'} ·{' '}
               {formatSize(countedTotal)}
+              {wishlistGames.length > 0
+                ? ` · ${wishlistGames.length} desejo${wishlistGames.length === 1 ? '' : 's'} · ${formatSize(wishlistTotal)}`
+                : ''}
               {skippedCount > 0 ? ` · ${skippedCount} fora da conta` : ''}
               {hasActiveFilters
                 ? ` · ${visible.length} ${visible.length === 1 ? 'visível' : 'visíveis'}`
@@ -835,6 +883,28 @@ export function GameLibrary({
       )}
 
       {archivePanel}
+
+      <WishDriveModal
+        open={wishDriveOpen}
+        drives={drives}
+        defaultDriveId={defaultDriveId ?? drives[0]?.id ?? ''}
+        title="Marcar desejos"
+        description={
+          visible.length === 1
+            ? `Em qual SSD “${visible[0].name}” será instalado no futuro?`
+            : `Em qual SSD os ${visible.length} jogos visíveis serão instalados no futuro?`
+        }
+        confirmLabel={
+          visible.length === 1
+            ? 'Marcar desejo'
+            : `Marcar ${visible.length} desejos`
+        }
+        onClose={() => setWishDriveOpen(false)}
+        onConfirm={(driveId) => {
+          onSetWishlist(visibleIds, true, driveId)
+          if (fillViewport) setDrawerOpen(false)
+        }}
+      />
     </div>
   )
 }

@@ -57,6 +57,7 @@ export function AddGameModal({
           </button>
         </div>
         <GameForm
+          className="game-form--modal"
           autoFocus
           sources={sources}
           defaultSourceId={defaultSourceId}

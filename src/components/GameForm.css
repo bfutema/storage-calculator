@@ -7,17 +7,26 @@
   display: grid;
   gap: 0.85rem;
   grid-template-columns: 1fr;
+  min-width: 0;
 }
 
 @media (min-width: 640px) {
   .game-form__fields {
-    grid-template-columns: 1.4fr 1fr;
+    grid-template-columns: minmax(12rem, 1.4fr) minmax(8rem, 1fr);
+  }
+
+  .game-form__fields .field--name {
+    grid-column: 1 / -1;
   }
 }
 
 @media (min-width: 900px) {
-  .game-form__fields {
-    grid-template-columns: minmax(0, 1.5fr) minmax(9rem, 12rem) minmax(10rem, 14rem);
+  .game-form:not(.game-form--modal) .game-form__fields {
+    grid-template-columns: minmax(14rem, 1.5fr) minmax(9rem, 12rem) minmax(10rem, 14rem);
+  }
+
+  .game-form:not(.game-form--modal) .game-form__fields .field--name {
+    grid-column: auto;
   }
 
   .game-form__fields .field--span {
@@ -25,9 +34,33 @@
   }
 }
 
+.game-form--modal .game-form__fields {
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 480px) {
+  .game-form--modal .game-form__fields {
+    grid-template-columns: minmax(8rem, 1fr) minmax(10rem, 1fr);
+  }
+
+  .game-form--modal .game-form__fields .field--name {
+    grid-column: 1 / -1;
+  }
+}
+
 .field {
   display: grid;
   gap: 0.4rem;
+  min-width: 0;
+}
+
+.field--name {
+  min-width: 0;
+}
+
+.field--name input {
+  min-width: 0;
+  width: 100%;
 }
 
 .field span {
@@ -102,7 +135,11 @@
   }
 
   .game-form--wide .game-form__fields {
-    grid-template-columns: minmax(0, 1.4fr) minmax(9rem, 12rem) minmax(10rem, 13rem);
+    grid-template-columns: minmax(14rem, 1.4fr) minmax(9rem, 12rem) minmax(10rem, 13rem);
+  }
+
+  .game-form--wide .game-form__fields .field--name {
+    grid-column: auto;
   }
 
   .game-form--wide .btn--primary {
@@ -128,8 +165,13 @@
   border-radius: 8px;
 }
 
-.btn--ghost:hover {
-  background: rgba(22, 53, 42, 0.08);
+.btn--ghost.is-wishlist {
+  color: var(--wishlist-ink);
+  background: color-mix(in srgb, var(--wishlist) 16%, transparent);
+}
+
+.btn--ghost.is-wishlist:hover {
+  background: color-mix(in srgb, var(--wishlist) 24%, transparent);
 }
 
 .btn--danger {
@@ -141,4 +183,18 @@
 
 .btn--danger:hover {
   background: rgba(196, 64, 48, 0.1);
+}
+
+.btn--icon {
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  display: inline-grid;
+  place-items: center;
+  border-radius: 8px;
+  flex: 0 0 auto;
+}
+
+.btn--icon svg {
+  display: block;
 }

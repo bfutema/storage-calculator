@@ -1,0 +1,120 @@
+.wish-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
+  background: rgba(18, 40, 32, 0.55);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+}
+
+.wish-modal__dialog {
+  width: min(24rem, 100%);
+  display: grid;
+  gap: 1rem;
+  padding: 1.25rem 1.35rem 1.4rem;
+  border-radius: 24px;
+  background: #f4f8f4;
+  border: 1px solid rgba(255, 255, 255, 0.85);
+  box-shadow: 0 24px 60px rgba(18, 40, 32, 0.28);
+  color: #12281f;
+}
+
+.wish-modal__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.wish-modal__head h2 {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1.2rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  color: #12281f;
+}
+
+.wish-modal__form {
+  display: grid;
+  gap: 1rem;
+}
+
+.wish-modal__hint {
+  margin: 0;
+  color: #5d756a;
+  line-height: 1.45;
+}
+
+.wish-modal__field {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.wish-modal__field span {
+  font-size: 0.85rem;
+  font-weight: 650;
+  color: #12281f;
+}
+
+.wish-modal__field select {
+  width: 100%;
+  appearance: none;
+  border: 1px solid rgba(22, 53, 42, 0.18);
+  border-radius: 12px;
+  padding: 0.7rem 0.85rem;
+  background: #ffffff;
+  color: #12281f;
+  font: inherit;
+}
+
+.wish-modal__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.5rem;
+  flex-wrap: wrap;
+}
+
+.wish-modal__ghost,
+.wish-modal__confirm {
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  font: inherit;
+  font-weight: 700;
+  border-radius: 999px;
+  transition: background 0.2s ease, opacity 0.2s ease, transform 0.15s ease;
+}
+
+.wish-modal__ghost {
+  background: transparent;
+  color: #1e3d31;
+  padding: 0.55rem 0.85rem;
+}
+
+.wish-modal__ghost:hover {
+  background: rgba(22, 53, 42, 0.08);
+}
+
+.wish-modal__confirm {
+  background: #12281f;
+  color: #eef4ee;
+  padding: 0.7rem 1.2rem;
+}
+
+.wish-modal__confirm:hover:not(:disabled) {
+  background: #16352a;
+}
+
+.wish-modal__confirm:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.wish-modal__ghost:active,
+.wish-modal__confirm:active:not(:disabled) {
+  transform: scale(0.98);
+}

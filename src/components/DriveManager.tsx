@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import { CAPACITY_PRESETS, type Drive } from '../types'
 import { formatSize, parseSizeInput, type StorageBreakdown } from '../utils/format'
+import { EditIcon, TrashIcon } from './ActionIcons'
 import './DriveManager.css'
 
 interface DriveManagerProps {
@@ -8,7 +9,7 @@ interface DriveManagerProps {
   breakdowns: StorageBreakdown[]
   selectedDriveId: string
   onSelect: (id: string) => void
-  onAdd: (name: string, capacityGb: number) => void
+  onAdd: (name: string, capacityGb: number) => string | void
   onUpdate: (
     id: string,
     patch: Partial<Pick<Drive, 'name' | 'capacityGb'>>,
@@ -35,9 +36,16 @@ export function DriveManager({
   const [editingId, setEditingId] = useState<string | null>(null)
   const [editName, setEditName] = useState('')
   const [editCapacity, setEditCapacity] = useState('')
+  const [addingOpen, setAddingOpen] = useState(false)
 
   function breakdownFor(id: string) {
     return breakdowns.find((item) => item.driveId === id)
+  }
+
+  function resetAddForm() {
+    setName('')
+    setCapacity('2000')
+    setError('')
   }
 
   function handleAdd(event: FormEvent) {
@@ -52,10 +60,12 @@ export function DriveManager({
       setError('Informe uma capacidade válida.')
       return
     }
-    onAdd(trimmed, capacityGb)
-    setName('')
-    setCapacity('2000')
-    setError('')
+    const id = onAdd(trimmed, capacityGb)
+    if (typeof id === 'string' && id) {
+      onSelect(id)
+    }
+    resetAddForm()
+    setAddingOpen(false)
   }
 
   function startEdit(drive: Drive) {
@@ -71,30 +81,124 @@ export function DriveManager({
     setEditingId(null)
   }
 
+  const addForm = (
+    <form
+      className={compact ? 'drives__add drives__add--compact' : 'drives__add'}
+      onSubmit={handleAdd}
+    >
+      {compact ? null : <h3>Adicionar SSD</h3>}
+      <div className="drives__add-fields">
+        <label className="field">
+          <span>Nome</span>
+          <input
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+            placeholder="Ex.: SSD externo 2 TB"
+            autoComplete="off"
+            autoFocus={compact}
+          />
+        </label>
+        <label className="field">
+          <span>Capacidade (GB)</span>
+          <input
+            value={capacity}
+            onChange={(e) => setCapacity(e.target.value)}
+            inputMode="decimal"
+            placeholder="2000"
+          />
+        </label>
+      </div>
+      <div className="capacity__presets" role="group" aria-label="Presets">
+        {CAPACITY_PRESETS.map((preset) => (
+          <button
+            key={preset.valueGb}
+            type="button"
+            className={`chip ${Number(capacity.replace(',', '.')) === preset.valueGb ? 'is-active' : ''}`}
+            onClick={() => setCapacity(String(preset.valueGb))}
+          >
+            {preset.label}
+          </button>
+        ))}
+      </div>
+      {error ? <p className="drives__error">{error}</p> : null}
+      <div className={compact ? 'drives__add-actions' : undefined}>
+        {compact ? (
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() => {
+              resetAddForm()
+              setAddingOpen(false)
+            }}
+          >
+            Cancelar
+          </button>
+        ) : null}
+        <button type="submit" className="btn btn--primary">
+          Adicionar SSD
+        </button>
+      </div>
+    </form>
+  )
+
   if (compact) {
     return (
-      <div className="drive-switcher" role="tablist" aria-label="SSDs">
-        {drives.map((drive) => {
-          const stats = breakdownFor(drive.id)
-          return (
-            <button
-              key={drive.id}
-              type="button"
-              role="tab"
-              className={`drive-switcher__btn ${selectedDriveId === drive.id ? 'is-active' : ''} ${stats?.isOverCapacity ? 'is-over' : ''}`}
-              aria-selected={selectedDriveId === drive.id}
-              onClick={() => onSelect(drive.id)}
-            >
-              <strong>{drive.name}</strong>
-              <span>
-                {drive.isInternal ? 'Interno' : 'Externo'}
-                {stats
-                  ? ` · ${Math.round(Math.min(stats.usedPercent, 999))}%`
-                  : ''}
-              </span>
-            </button>
-          )
-        })}
+      <div className="drive-switcher">
+        <div className="drive-switcher__list" role="tablist" aria-label="SSDs">
+          {drives.map((drive) => {
+            const stats = breakdownFor(drive.id)
+            const selected = selectedDriveId === drive.id
+            const percent = stats
+              ? Math.round(Math.min(stats.usedPercent, 999))
+              : null
+            const percentLabel = percent === null ? '—' : `${percent}%`
+
+            return (
+              <button
+                key={drive.id}
+                type="button"
+                role="tab"
+                className={`drive-switcher__btn ${selected ? 'is-active' : 'is-compact'} ${stats?.isOverCapacity ? 'is-over' : ''}`}
+                aria-selected={selected}
+                aria-label={
+                  percent === null
+                    ? drive.name
+                    : `${drive.name}, ${percent}% ocupado`
+                }
+                title={drive.name}
+                onClick={() => onSelect(drive.id)}
+              >
+                {selected ? (
+                  <>
+                    <strong>{drive.name}</strong>
+                    <span>{percentLabel}</span>
+                  </>
+                ) : (
+                  <em>{percentLabel}</em>
+                )}
+              </button>
+            )
+          })}
+          <button
+            type="button"
+            className={`drive-switcher__add ${addingOpen ? 'is-active' : ''}`}
+            onClick={() => {
+              setAddingOpen((open) => !open)
+              setError('')
+            }}
+            aria-expanded={addingOpen}
+            aria-controls="focus-add-drive"
+            aria-label="Adicionar SSD"
+            title="Adicionar SSD"
+          >
+            <span aria-hidden="true">+</span>
+          </button>
+        </div>
+        {addingOpen ? (
+          <div id="focus-add-drive" className="drive-switcher__form">
+            {addForm}
+          </div>
+        ) : null}
       </div>
     )
   }
@@ -176,10 +280,7 @@ export function DriveManager({
                         : ''}
                     </span>
                     {stats ? (
-                      <span
-                        className="drive-card__bar"
-                        aria-hidden="true"
-                      >
+                      <span className="drive-card__bar" aria-hidden="true">
                         <i
                           style={{
                             width: `${Math.min(stats.usedPercent, 100)}%`,
@@ -201,18 +302,22 @@ export function DriveManager({
                     ) : null}
                     <button
                       type="button"
-                      className="btn btn--ghost"
+                      className="btn btn--ghost btn--icon"
                       onClick={() => startEdit(drive)}
+                      aria-label={`Editar ${drive.name}`}
+                      title="Editar"
                     >
-                      Editar
+                      <EditIcon />
                     </button>
                     {drives.length > 1 ? (
                       <button
                         type="button"
-                        className="btn btn--danger"
+                        className="btn btn--danger btn--icon"
                         onClick={() => onRemove(drive.id)}
+                        aria-label={`Remover ${drive.name}`}
+                        title="Remover"
                       >
-                        Remover
+                        <TrashIcon />
                       </button>
                     ) : null}
                   </div>
@@ -223,45 +328,7 @@ export function DriveManager({
         })}
       </ul>
 
-      <form className="drives__add" onSubmit={handleAdd}>
-        <h3>Adicionar SSD</h3>
-        <div className="drives__add-fields">
-          <label className="field">
-            <span>Nome</span>
-            <input
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Ex.: SSD externo 2 TB"
-              autoComplete="off"
-            />
-          </label>
-          <label className="field">
-            <span>Capacidade (GB)</span>
-            <input
-              value={capacity}
-              onChange={(e) => setCapacity(e.target.value)}
-              inputMode="decimal"
-              placeholder="2000"
-            />
-          </label>
-        </div>
-        <div className="capacity__presets" role="group" aria-label="Presets">
-          {CAPACITY_PRESETS.map((preset) => (
-            <button
-              key={preset.valueGb}
-              type="button"
-              className={`chip ${Number(capacity.replace(',', '.')) === preset.valueGb ? 'is-active' : ''}`}
-              onClick={() => setCapacity(String(preset.valueGb))}
-            >
-              {preset.label}
-            </button>
-          ))}
-        </div>
-        {error ? <p className="drives__error">{error}</p> : null}
-        <button type="submit" className="btn btn--primary">
-          Adicionar SSD
-        </button>
-      </form>
+      {addForm}
     </section>
   )
 }

@@ -49,6 +49,8 @@ function App() {
     setGamesDrive,
     setGameCounted,
     setGamesCounted,
+    setGameWishlist,
+    setGamesWishlist,
     setGameArchived,
     setGamesArchived,
     removeGame,
@@ -96,6 +98,8 @@ function App() {
       onSetGamesDrive={setGamesDrive}
       onSetSource={setGameSource}
       onSetGamesSource={setGamesSource}
+      onToggleWishlist={setGameWishlist}
+      onSetWishlist={setGamesWishlist}
       onAddSource={addSource}
       onRemoveSource={removeSource}
       onArchive={(id) => setGameArchived(id, true)}
@@ -139,6 +143,19 @@ function App() {
         <>
           <header className="focus-bar">
             <p className="focus-bar__brand">Storage Calculator</p>
+            <div className="focus-bar__drives">
+              <DriveManager
+                compact
+                drives={state.drives}
+                breakdowns={allBreakdowns}
+                selectedDriveId={effectiveDriveId}
+                onSelect={setSelectedDriveId}
+                onAdd={addDrive}
+                onUpdate={updateDrive}
+                onSetInternal={setInternalDrive}
+                onRemove={removeDrive}
+              />
+            </div>
             <button
               type="button"
               className="mode-toggle is-active"
@@ -154,17 +171,6 @@ function App() {
 
           <main className="focus-layout">
             <aside className="panel panel--focus-stats">
-              <DriveManager
-                compact
-                drives={state.drives}
-                breakdowns={allBreakdowns}
-                selectedDriveId={effectiveDriveId}
-                onSelect={setSelectedDriveId}
-                onAdd={addDrive}
-                onUpdate={updateDrive}
-                onSetInternal={setInternalDrive}
-                onRemove={removeDrive}
-              />
               <DiskGauge breakdown={breakdown} compact />
               {selectedDrive ? (
                 <CollapsibleSection

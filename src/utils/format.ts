@@ -75,6 +75,8 @@ export interface StorageBreakdown {
   driveName: string
   isInternal: boolean
   gamesGb: number
+  wishlistGb: number
+  wishlistCount: number
   gameSources: BreakdownCategory[]
   bufferGb: number
   reservedGb: number
@@ -107,7 +109,11 @@ export function calculateDriveBreakdown(
   const driveGames = state.games.filter(
     (game) => !game.archived && game.counted && game.driveId === drive.id,
   )
+  const wishlistGames = state.games.filter(
+    (game) => !game.archived && game.wishlist && game.driveId === drive.id,
+  )
   const gamesGb = driveGames.reduce((sum, game) => sum + game.sizeGb, 0)
+  const wishlistGb = wishlistGames.reduce((sum, game) => sum + game.sizeGb, 0)
   const bufferGb = gamesGb * (state.updateBufferPercent / 100)
 
   const totals = new Map<string, { sizeGb: number; count: number }>()
@@ -159,7 +165,7 @@ export function calculateDriveBreakdown(
     }),
   )
   const reservedGb = categories.reduce((sum, item) => sum + item.sizeGb, 0)
-  const modeledUsedGb = gamesGb + bufferGb + reservedGb
+  const modeledUsedGb = gamesGb + bufferGb + wishlistGb + reservedGb
 
   const advertisedGb = drive.capacityGb
   const osCapacityGb = toOsCapacityGb(advertisedGb, state.useBinaryConversion)
@@ -197,6 +203,8 @@ export function calculateDriveBreakdown(
     driveName: drive.name,
     isInternal: drive.isInternal,
     gamesGb,
+    wishlistGb,
+    wishlistCount: wishlistGames.length,
     gameSources,
     bufferGb,
     reservedGb,

@@ -1,6 +1,7 @@
 import { useState, type FormEvent } from 'react'
 import type { SpaceCategory } from '../types'
 import { formatSize, parseSizeInput } from '../utils/format'
+import { EditIcon, TrashIcon } from './ActionIcons'
 import './SpaceCategories.css'
 
 interface SpaceCategoriesProps {
@@ -126,17 +127,21 @@ export function SpaceCategories({
                   <div className="space-cats__actions">
                     <button
                       type="button"
-                      className="btn btn--ghost"
+                      className="btn btn--ghost btn--icon"
                       onClick={() => startEdit(category)}
+                      aria-label={`Editar ${category.name}`}
+                      title="Editar"
                     >
-                      Editar
+                      <EditIcon />
                     </button>
                     <button
                       type="button"
-                      className="btn btn--danger"
+                      className="btn btn--danger btn--icon"
                       onClick={() => onRemove(category.id)}
+                      aria-label={`Remover ${category.name}`}
+                      title="Remover"
                     >
-                      Remover
+                      <TrashIcon />
                     </button>
                   </div>
                 </>

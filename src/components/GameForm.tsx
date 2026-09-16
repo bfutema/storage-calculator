@@ -81,7 +81,7 @@ export function GameForm({
       onSubmit={handleSubmit}
     >
       <div className="game-form__fields">
-        <label className="field">
+        <label className="field field--name">
           <span>Jogo</span>
           <input
             type="text"

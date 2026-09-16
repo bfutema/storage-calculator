@@ -1,4 +1,4 @@
-import { type ReactNode, type SyntheticEvent } from 'react'
+import { useState, type ReactNode, type SyntheticEvent } from 'react'
 import './CollapsibleSection.css'
 
 interface CollapsibleSectionProps {
@@ -37,18 +37,16 @@ export function CollapsibleSection({
   summary,
   children,
 }: CollapsibleSectionProps) {
-  const initiallyOpen = loadOpen(storageKey, defaultOpen)
+  const [open, setOpen] = useState(() => loadOpen(storageKey, defaultOpen))
 
   function handleToggle(event: SyntheticEvent<HTMLDetailsElement>) {
-    persistOpen(storageKey, event.currentTarget.open)
+    const next = event.currentTarget.open
+    setOpen(next)
+    persistOpen(storageKey, next)
   }
 
   return (
-    <details
-      className="collapse"
-      defaultOpen={initiallyOpen}
-      onToggle={handleToggle}
-    >
+    <details className="collapse" open={open} onToggle={handleToggle}>
       <summary className="collapse__trigger">
         <span className="collapse__copy">
           <span className="collapse__title">{title}</span>

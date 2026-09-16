@@ -1,9 +1,11 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { Drive, Game, GameSource } from '../types'
 import { formatSize } from '../utils/format'
-import { TrashIcon } from './ActionIcons'
+import { ArchiveIcon, ToolsIcon, TrashIcon } from './ActionIcons'
 import { GameForm } from './GameForm'
 import { GameList, type SortDirection, type SortField, type ViewMode } from './GameList'
+import { ViewModePicker } from './ViewModePicker'
 import { WishDriveModal } from './WishDriveModal'
 import './GameLibrary.css'
 
@@ -138,6 +140,7 @@ export function GameLibrary({
   const [drawerOpen, setDrawerOpen] = useState(false)
   const [archiveOpen, setArchiveOpen] = useState(false)
   const [wishDriveOpen, setWishDriveOpen] = useState(false)
+  const isCompactViewport = useMediaQuery('(max-width: 560px)')
 
   const activeGames = useMemo(
     () => games.filter((game) => !game.archived),
@@ -305,6 +308,12 @@ export function GameLibrary({
         Cards
       </button>
     </div>
+  )
+
+  const viewControl = isCompactViewport ? (
+    <ViewModePicker value={viewMode} onChange={handleViewChange} />
+  ) : (
+    viewToggle
   )
 
   const filterGroups = (
@@ -721,29 +730,33 @@ export function GameLibrary({
         <div className="library__intro-actions">
           <button
             type="button"
-            className={`library__tools-btn ${archiveOpen ? 'is-active' : ''}`}
+            className={`library__tools-btn ${isCompactViewport ? 'library__tools-btn--icon' : ''} ${archiveOpen ? 'is-active' : ''}`}
             onClick={() => {
               setDrawerOpen(false)
               setArchiveOpen(true)
             }}
             aria-haspopup="dialog"
             aria-expanded={archiveOpen}
+            aria-label={isCompactViewport ? 'Arquivados' : undefined}
+            title={isCompactViewport ? 'Arquivados' : undefined}
           >
-            Arquivados
+            {isCompactViewport ? <ArchiveIcon size={18} /> : 'Arquivados'}
             {archivedGames.length > 0 ? <em>{archivedGames.length}</em> : null}
           </button>
           {fillViewport && activeGames.length > 0 ? (
             <button
               type="button"
-              className={`library__tools-btn ${drawerOpen ? 'is-active' : ''} ${activeToolCount > 0 ? 'has-filters' : ''}`}
+              className={`library__tools-btn ${isCompactViewport ? 'library__tools-btn--icon' : ''} ${drawerOpen ? 'is-active' : ''} ${activeToolCount > 0 ? 'has-filters' : ''}`}
               onClick={() => {
                 setArchiveOpen(false)
                 setDrawerOpen(true)
               }}
               aria-haspopup="dialog"
               aria-expanded={drawerOpen}
+              aria-label={isCompactViewport ? 'Ferramentas' : undefined}
+              title={isCompactViewport ? 'Ferramentas' : undefined}
             >
-              Ferramentas
+              {isCompactViewport ? <ToolsIcon size={18} /> : 'Ferramentas'}
               {activeToolCount > 0 ? <em>{activeToolCount}</em> : null}
             </button>
           ) : null}
@@ -773,7 +786,7 @@ export function GameLibrary({
                   autoComplete="off"
                 />
               </label>
-              {viewToggle}
+              {viewControl}
             </div>
           ) : (
             <>
@@ -788,7 +801,7 @@ export function GameLibrary({
                     autoComplete="off"
                   />
                 </label>
-                {viewToggle}
+                {viewControl}
               </div>
 
               <div className="library__filters">{filterGroups}</div>

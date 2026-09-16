@@ -67,6 +67,94 @@ export function TrashIcon({ size = 16, className }: IconProps) {
   )
 }
 
+export function ListViewIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 7h16M4 12h16M4 17h16"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
+export function TableViewIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 5.5h16v13H4v-13z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M4 9.5h16M4 14h16M12 9.5v9"
+        stroke="currentColor"
+        strokeWidth="1.6"
+      />
+    </svg>
+  )
+}
+
+export function CardsViewIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M4.5 5.5h6v6h-6v-6zM13.5 5.5h6v6h-6v-6zM4.5 12.5h6v6h-6v-6zM13.5 12.5h6v6h-6v-6z"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinejoin="round"
+      />
+    </svg>
+  )
+}
+
+export function ToolsIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M5 7h14M8 12h11M11 17h8"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinecap="round"
+      />
+      <circle cx="15.5" cy="7" r="2" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="6.5" cy="12" r="2" stroke="currentColor" strokeWidth="1.7" />
+      <circle cx="8.5" cy="17" r="2" stroke="currentColor" strokeWidth="1.7" />
+    </svg>
+  )
+}
+
 export function SidebarIcon({ size = 18, className }: IconProps) {
   return (
     <svg

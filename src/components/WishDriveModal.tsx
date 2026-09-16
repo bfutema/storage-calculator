@@ -14,8 +14,16 @@ interface WishDriveModalProps {
   onConfirm: (driveId: string) => void
 }
 
-export function WishDriveModal({
-  open,
+export function WishDriveModal({ open, drives, ...rest }: WishDriveModalProps) {
+  if (!open || drives.length === 0) return null
+
+  return <WishDriveDialog drives={drives} {...rest} />
+}
+
+type WishDriveDialogProps = Omit<WishDriveModalProps, 'open'>
+
+/** Montado só enquanto aberto: o SSD de destino volta ao padrão a cada abertura. */
+function WishDriveDialog({
   drives,
   defaultDriveId,
   title = 'Lista de desejos',
@@ -23,7 +31,7 @@ export function WishDriveModal({
   confirmLabel = 'Marcar desejo',
   onClose,
   onConfirm,
-}: WishDriveModalProps) {
+}: WishDriveDialogProps) {
   const fallbackId = drives[0]?.id ?? ''
   const initialId = drives.some((drive) => drive.id === defaultDriveId)
     ? defaultDriveId
@@ -31,17 +39,6 @@ export function WishDriveModal({
   const [driveId, setDriveId] = useState(initialId)
 
   useEffect(() => {
-    if (!open) return
-    setDriveId(
-      drives.some((drive) => drive.id === defaultDriveId)
-        ? defaultDriveId
-        : (drives[0]?.id ?? ''),
-    )
-  }, [open, defaultDriveId, drives])
-
-  useEffect(() => {
-    if (!open) return
-
     const previousOverflow = document.body.style.overflow
     document.body.style.overflow = 'hidden'
 
@@ -54,9 +51,7 @@ export function WishDriveModal({
       document.body.style.overflow = previousOverflow
       document.removeEventListener('keydown', handleKey)
     }
-  }, [open, onClose])
-
-  if (!open || drives.length === 0) return null
+  }, [onClose])
 
   function handleBackdrop(event: MouseEvent<HTMLDivElement>) {
     if (event.target === event.currentTarget) onClose()

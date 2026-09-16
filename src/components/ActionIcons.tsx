@@ -67,6 +67,38 @@ export function TrashIcon({ size = 16, className }: IconProps) {
   )
 }
 
+export function SidebarIcon({ size = 18, className }: IconProps) {
+  return (
+    <svg
+      className={className}
+      width={size}
+      height={size}
+      viewBox="0 0 24 24"
+      fill="none"
+      aria-hidden="true"
+    >
+      <path
+        d="M4 5.5h16v13H4v-13z"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M10 5.5v13"
+        stroke="currentColor"
+        strokeWidth="1.8"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M6.4 9h1.4M6.4 12h1.4M6.4 15h1.4"
+        stroke="currentColor"
+        strokeWidth="1.6"
+        strokeLinecap="round"
+      />
+    </svg>
+  )
+}
+
 export function ArchiveIcon({ size = 16, className }: IconProps) {
   return (
     <svg

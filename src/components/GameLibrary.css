@@ -393,6 +393,23 @@
   min-height: 0;
 }
 
+/* No modo foco mobile a tela inteira já é a biblioteca: o título vira só rótulo acessível. */
+@media (max-width: 560px) {
+  .library--fill .library__intro h2 {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+  }
+
+  .library--fill .library__tools-btn {
+    padding: 0.4rem 0.7rem;
+    font-size: 0.82rem;
+  }
+}
+
 .library-drawer {
   position: fixed;
   inset: 0;

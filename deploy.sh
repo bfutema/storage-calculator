@@ -116,13 +116,23 @@ fi
 
 echo "🧹 Limpando arquivos antigos..."
 git rm -rf . --ignore-unmatch 2>/dev/null || true
-find . -maxdepth 1 ! -name '.' ! -name '.git' -exec rm -rf {} + 2>/dev/null || true
+# node_modules e dist ficam de fora para não reinstalar as dependências a cada deploy.
+find . -maxdepth 1 \
+  ! -name '.' ! -name '.git' ! -name 'node_modules' ! -name 'dist' \
+  -exec rm -rf {} + 2>/dev/null || true
 
 echo "📋 Copiando arquivos do build..."
 cp -r "$TEMP_DIR"/. .
 rm -rf "$TEMP_DIR"
 
 touch .nojekyll
+
+cat > .gitignore << 'EOF'
+node_modules/
+dist/
+*.log
+.DS_Store
+EOF
 
 echo "💾 Commitando..."
 git add -A

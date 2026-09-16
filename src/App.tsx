@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react'
+import { SidebarIcon } from './components/ActionIcons'
 import { AddGameModal } from './components/AddGameModal'
 import { CapacitySetup } from './components/CapacitySetup'
 import { CollapsibleSection } from './components/CollapsibleSection'
@@ -8,6 +9,8 @@ import { FreeCalibration } from './components/FreeCalibration'
 import { GameLibrary } from './components/GameLibrary'
 import { SpaceCategories } from './components/SpaceCategories'
 import { useLibrary } from './hooks/useLibrary'
+import { useMediaQuery } from './hooks/useMediaQuery'
+import { FocusDrawer } from './layouts/FocusDrawer'
 import { getDriveById, getInternalDrive } from './types'
 import {
   calculateAllBreakdowns,
@@ -60,6 +63,8 @@ function App() {
 
   const [focusMode, setFocusMode] = useState(loadFocusMode)
   const [addOpen, setAddOpen] = useState(false)
+  const [drawerOpen, setDrawerOpen] = useState(false)
+  const isCompactViewport = useMediaQuery('(max-width: 899px)')
   const internal = getInternalDrive(state.drives)
   const [selectedDriveId, setSelectedDriveId] = useState(
     () => internal?.id ?? state.drives[0]?.id ?? '',
@@ -83,6 +88,8 @@ function App() {
       /* ignore */
     }
   }, [focusMode])
+
+  const drawerVisible = focusMode && isCompactViewport && drawerOpen
 
   const library = (
     <GameLibrary
@@ -134,127 +141,176 @@ function App() {
     </div>
   )
 
+  const focusDrives = (
+    <DriveManager
+      compact
+      drives={state.drives}
+      breakdowns={allBreakdowns}
+      selectedDriveId={effectiveDriveId}
+      onSelect={setSelectedDriveId}
+      onAdd={addDrive}
+      onUpdate={updateDrive}
+      onSetInternal={setInternalDrive}
+      onRemove={removeDrive}
+    />
+  )
+
+  const focusStats = (
+    <>
+      <DiskGauge breakdown={breakdown} compact />
+      {selectedDrive ? (
+        <CollapsibleSection
+          key={`cap-${selectedDrive.id}`}
+          title="Capacidade do SSD"
+          storageKey="storage-calculator:focus-capacity-open"
+          defaultOpen={false}
+          summary={`${formatSize(selectedDrive.capacityGb)} → ${formatSize(breakdown.effectiveCapacityGb)}`}
+        >
+          <div className="focus-capacity-stack">
+            <CapacitySetup
+              compact
+              hideCategories
+              drive={selectedDrive}
+              updateBufferPercent={state.updateBufferPercent}
+              useBinaryConversion={state.useBinaryConversion}
+              ssdOverheadPercent={state.ssdOverheadPercent}
+              osCapacityGb={breakdown.osCapacityGb}
+              effectiveCapacityGb={breakdown.effectiveCapacityGb}
+              binaryLossGb={breakdown.binaryLossGb}
+              ssdOverheadGb={breakdown.ssdOverheadGb}
+              usedGb={breakdown.usedGb}
+              freeGb={breakdown.freeGb}
+              onCapacityChange={(gb) =>
+                updateDrive(selectedDrive.id, { capacityGb: gb })
+              }
+              onBufferChange={setUpdateBufferPercent}
+              onUseBinaryConversionChange={setUseBinaryConversion}
+              onSsdOverheadChange={setSsdOverheadPercent}
+            />
+            <FreeCalibration
+              compact
+              modeledFreeGb={breakdown.modeledFreeGb}
+              calibrationOffsetGb={selectedDrive.calibrationOffsetGb}
+              onApply={(realFreeGb) => {
+                const offset = breakdown.modeledFreeGb - realFreeGb
+                updateDrive(selectedDrive.id, {
+                  calibrationOffsetGb: offset,
+                })
+              }}
+              onClear={() =>
+                updateDrive(selectedDrive.id, {
+                  calibrationOffsetGb: null,
+                })
+              }
+            />
+          </div>
+        </CollapsibleSection>
+      ) : null}
+      {selectedDrive ? (
+        <CollapsibleSection
+          key={`cat-${selectedDrive.id}`}
+          title="Uso fora dos jogos"
+          storageKey="storage-calculator:focus-categories-open"
+          defaultOpen={false}
+          summary={
+            state.categories.filter(
+              (category) => category.driveId === selectedDrive.id,
+            ).length > 0
+              ? `${
+                  state.categories.filter(
+                    (category) => category.driveId === selectedDrive.id,
+                  ).length
+                } categorias · ${formatSize(breakdown.reservedGb)}`
+              : 'Nenhuma categoria'
+          }
+        >
+          <SpaceCategories
+            compact
+            driveId={selectedDrive.id}
+            driveName={selectedDrive.name}
+            categories={state.categories}
+            onAdd={addCategory}
+            onUpdate={updateCategory}
+            onRemove={removeCategory}
+          />
+        </CollapsibleSection>
+      ) : null}
+      {hint}
+    </>
+  )
+
   return (
-    <div className={focusMode ? 'app app--focus' : 'app'}>
+    <div
+      className={[
+        'app',
+        focusMode ? 'app--focus' : '',
+        drawerVisible ? 'app--drawer' : '',
+      ]
+        .filter(Boolean)
+        .join(' ')}
+    >
       <div className="app__glow" aria-hidden="true" />
       <div className="app__grid" aria-hidden="true" />
 
       {focusMode ? (
         <>
           <header className="focus-bar">
-            <p className="focus-bar__brand">Storage Calculator</p>
-            <div className="focus-bar__drives">
-              <DriveManager
-                compact
-                drives={state.drives}
-                breakdowns={allBreakdowns}
-                selectedDriveId={effectiveDriveId}
-                onSelect={setSelectedDriveId}
-                onAdd={addDrive}
-                onUpdate={updateDrive}
-                onSetInternal={setInternalDrive}
-                onRemove={removeDrive}
-              />
-            </div>
+            {isCompactViewport ? (
+              <button
+                type="button"
+                className={`focus-bar__drawer-btn ${breakdown.isOverCapacity ? 'is-over' : ''}`}
+                onClick={() => setDrawerOpen(true)}
+                aria-haspopup="dialog"
+                aria-expanded={drawerVisible}
+              >
+                <SidebarIcon />
+                <span className="focus-bar__drawer-copy">
+                  <strong>{breakdown.driveName}</strong>
+                  <em>
+                    {Math.round(Math.min(breakdown.usedPercent, 999))}% ·{' '}
+                    {formatSize(Math.abs(breakdown.freeGb))}{' '}
+                    {breakdown.isOverCapacity ? 'faltando' : 'livre'}
+                  </em>
+                </span>
+              </button>
+            ) : (
+              <>
+                <p className="focus-bar__brand">Storage Calculator</p>
+                <div className="focus-bar__drives">{focusDrives}</div>
+              </>
+            )}
             <button
               type="button"
               className="mode-toggle is-active"
               onClick={() => {
                 setAddOpen(false)
+                setDrawerOpen(false)
                 setFocusMode(false)
               }}
               aria-pressed="true"
             >
-              Sair do modo foco
+              {isCompactViewport ? 'Sair' : 'Sair do modo foco'}
             </button>
           </header>
 
           <main className="focus-layout">
-            <aside className="panel panel--focus-stats">
-              <DiskGauge breakdown={breakdown} compact />
-              {selectedDrive ? (
-                <CollapsibleSection
-                  key={`cap-${selectedDrive.id}`}
-                  title="Capacidade do SSD"
-                  storageKey="storage-calculator:focus-capacity-open"
-                  defaultOpen={false}
-                  summary={`${formatSize(selectedDrive.capacityGb)} → ${formatSize(breakdown.effectiveCapacityGb)}`}
-                >
-                  <div className="focus-capacity-stack">
-                    <CapacitySetup
-                      compact
-                      hideCategories
-                      drive={selectedDrive}
-                      updateBufferPercent={state.updateBufferPercent}
-                      useBinaryConversion={state.useBinaryConversion}
-                      ssdOverheadPercent={state.ssdOverheadPercent}
-                      osCapacityGb={breakdown.osCapacityGb}
-                      effectiveCapacityGb={breakdown.effectiveCapacityGb}
-                      binaryLossGb={breakdown.binaryLossGb}
-                      ssdOverheadGb={breakdown.ssdOverheadGb}
-                      usedGb={breakdown.usedGb}
-                      freeGb={breakdown.freeGb}
-                      onCapacityChange={(gb) =>
-                        updateDrive(selectedDrive.id, { capacityGb: gb })
-                      }
-                      onBufferChange={setUpdateBufferPercent}
-                      onUseBinaryConversionChange={setUseBinaryConversion}
-                      onSsdOverheadChange={setSsdOverheadPercent}
-                    />
-                    <FreeCalibration
-                      compact
-                      modeledFreeGb={breakdown.modeledFreeGb}
-                      calibrationOffsetGb={selectedDrive.calibrationOffsetGb}
-                      onApply={(realFreeGb) => {
-                        const offset = breakdown.modeledFreeGb - realFreeGb
-                        updateDrive(selectedDrive.id, {
-                          calibrationOffsetGb: offset,
-                        })
-                      }}
-                      onClear={() =>
-                        updateDrive(selectedDrive.id, {
-                          calibrationOffsetGb: null,
-                        })
-                      }
-                    />
-                  </div>
-                </CollapsibleSection>
-              ) : null}
-              {selectedDrive ? (
-                <CollapsibleSection
-                  key={`cat-${selectedDrive.id}`}
-                  title="Uso fora dos jogos"
-                  storageKey="storage-calculator:focus-categories-open"
-                  defaultOpen={false}
-                  summary={
-                    state.categories.filter(
-                      (category) => category.driveId === selectedDrive.id,
-                    ).length > 0
-                      ? `${
-                          state.categories.filter(
-                            (category) =>
-                              category.driveId === selectedDrive.id,
-                          ).length
-                        } categorias · ${formatSize(breakdown.reservedGb)}`
-                      : 'Nenhuma categoria'
-                  }
-                >
-                  <SpaceCategories
-                    compact
-                    driveId={selectedDrive.id}
-                    driveName={selectedDrive.name}
-                    categories={state.categories}
-                    onAdd={addCategory}
-                    onUpdate={updateCategory}
-                    onRemove={removeCategory}
-                  />
-                </CollapsibleSection>
-              ) : null}
-              {hint}
-            </aside>
+            {isCompactViewport ? null : (
+              <aside className="panel panel--focus-stats">{focusStats}</aside>
+            )}
 
             <section className="panel panel--focus-library">{library}</section>
           </main>
+
+          {isCompactViewport ? (
+            <FocusDrawer
+              open={drawerVisible}
+              title="SSDs e detalhes"
+              onClose={() => setDrawerOpen(false)}
+            >
+              {focusDrives}
+              {focusStats}
+            </FocusDrawer>
+          ) : null}
 
           <button
             type="button"

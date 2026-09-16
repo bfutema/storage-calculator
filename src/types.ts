@@ -152,6 +152,7 @@ export const MICROSD_CAPACITY_PRESETS = [
   { label: '256 GB', valueGb: 256 },
   { label: '512 GB', valueGb: 512 },
   { label: '1 TB', valueGb: 1000 },
+  { label: '2 TB', valueGb: 2000 },
 ] as const
 
 export const DEFAULT_CAPACITY_BY_TYPE: Record<StorageType, number> = {

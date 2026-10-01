@@ -1,14 +1,15 @@
 import { useEffect, type MouseEvent } from 'react'
 import type { GameSource } from '../types'
-import { GameForm } from './GameForm'
+import { GameForm, type GameFormValues } from './GameForm'
 import './AddGameModal.css'
 
 interface AddGameModalProps {
   open: boolean
   onClose: () => void
   sources: GameSource[]
+  franchiseSuggestions?: string[]
   defaultSourceId?: string
-  onAdd: (name: string, sizeGb: number, sourceId: string) => void
+  onAdd: (values: GameFormValues) => void
   onAddSource?: (name: string) => string | null
 }
 
@@ -16,6 +17,7 @@ export function AddGameModal({
   open,
   onClose,
   sources,
+  franchiseSuggestions,
   defaultSourceId,
   onAdd,
   onAddSource,
@@ -37,8 +39,8 @@ export function AddGameModal({
     if (event.target === event.currentTarget) onClose()
   }
 
-  function handleAdd(name: string, sizeGb: number, sourceId: string) {
-    onAdd(name, sizeGb, sourceId)
+  function handleAdd(values: GameFormValues) {
+    onAdd(values)
     onClose()
   }
 
@@ -60,6 +62,7 @@ export function AddGameModal({
           className="game-form--modal"
           autoFocus
           sources={sources}
+          franchiseSuggestions={franchiseSuggestions}
           defaultSourceId={defaultSourceId}
           onAdd={handleAdd}
           onAddSource={onAddSource}

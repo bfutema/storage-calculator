@@ -1,25 +1,33 @@
 import { useState, type FormEvent } from 'react'
 import type { Drive, Game, GameSource } from '../types'
-import { formatSize, parseSizeInput } from '../utils/format'
+import { formatReleaseDate, formatSize, parseSizeInput } from '../utils/format'
 import { ArchiveIcon, EditIcon, TrashIcon } from './ActionIcons'
 import { WishDriveModal } from './WishDriveModal'
 import './GameList.css'
 
 export type ViewMode = 'list' | 'table' | 'cards'
-export type SortField = 'name' | 'size'
+export type SortField = 'name' | 'size' | 'release'
 export type SortDirection = 'asc' | 'desc'
 
 interface GameListProps {
   games: Game[]
   drives: Drive[]
   sources: GameSource[]
+  franchiseSuggestions?: string[]
   viewMode: ViewMode
   sortField: SortField
   sortDirection: SortDirection
   emptyMessage: string
   hideSort?: boolean
   onSort: (field: SortField) => void
-  onUpdate: (id: string, name: string, sizeGb: number, sourceId?: string) => void
+  onUpdate: (
+    id: string,
+    name: string,
+    sizeGb: number,
+    sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
+  ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
@@ -32,6 +40,7 @@ export function GameList({
   games,
   drives,
   sources,
+  franchiseSuggestions = [],
   viewMode,
   sortField,
   sortDirection,
@@ -58,6 +67,7 @@ export function GameList({
     games,
     drives,
     sources,
+    franchiseSuggestions,
     sortField,
     sortDirection,
     hideSort,
@@ -80,11 +90,19 @@ interface ViewProps {
   games: Game[]
   drives: Drive[]
   sources: GameSource[]
+  franchiseSuggestions: string[]
   sortField: SortField
   sortDirection: SortDirection
   hideSort?: boolean
   onSort: (field: SortField) => void
-  onUpdate: (id: string, name: string, sizeGb: number, sourceId?: string) => void
+  onUpdate: (
+    id: string,
+    name: string,
+    sizeGb: number,
+    sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
+  ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
@@ -111,6 +129,15 @@ function gameCardClass(game: Game): string {
   return 'game-card game-row--skipped'
 }
 
+function gameMetaLine(game: Game, sourceName: string): string {
+  const parts = [formatSize(game.sizeGb), sourceName]
+  if (game.franchise) parts.push(game.franchise)
+  if (game.releaseDate) parts.push(formatReleaseDate(game.releaseDate))
+  if (game.wishlist) parts.push('desejo')
+  else if (!game.counted) parts.push('fora da conta')
+  return parts.join(' · ')
+}
+
 function SortButtons({
   sortField,
   sortDirection,
@@ -129,6 +156,13 @@ function SortButtons({
       <SortButton
         label="Tamanho"
         field="size"
+        sortField={sortField}
+        sortDirection={sortDirection}
+        onSort={onSort}
+      />
+      <SortButton
+        label="Cronológica"
+        field="release"
         sortField={sortField}
         sortDirection={sortDirection}
         onSort={onSort}
@@ -225,6 +259,7 @@ function ListView(props: ViewProps) {
     games,
     drives,
     sources,
+    franchiseSuggestions,
     sortField,
     sortDirection,
     hideSort = false,
@@ -254,6 +289,7 @@ function ListView(props: ViewProps) {
             game={game}
             drives={drives}
             sources={sources}
+            franchiseSuggestions={franchiseSuggestions}
             index={index}
             onUpdate={onUpdate}
             onToggleCounted={onToggleCounted}
@@ -274,6 +310,7 @@ function TableView(props: ViewProps) {
     games,
     drives,
     sources,
+    franchiseSuggestions,
     sortField,
     sortDirection,
     onSort,
@@ -316,6 +353,19 @@ function TableView(props: ViewProps) {
                 ) : null}
               </button>
             </th>
+            <th>Franquia</th>
+            <th>
+              <button
+                type="button"
+                className={`table-sort ${sortField === 'release' ? 'is-active' : ''}`}
+                onClick={() => onSort('release')}
+              >
+                Lançamento
+                {sortField === 'release' ? (
+                  <em aria-hidden="true">{sortDirection === 'asc' ? '↑' : '↓'}</em>
+                ) : null}
+              </button>
+            </th>
             <th>Origem</th>
             <th>SSD</th>
             <th>Situação</th>
@@ -329,6 +379,7 @@ function TableView(props: ViewProps) {
               game={game}
               drives={drives}
               sources={sources}
+              franchiseSuggestions={franchiseSuggestions}
               index={index}
               onUpdate={onUpdate}
               onToggleCounted={onToggleCounted}
@@ -350,6 +401,7 @@ function CardsView(props: ViewProps) {
     games,
     drives,
     sources,
+    franchiseSuggestions,
     sortField,
     sortDirection,
     hideSort = false,
@@ -379,6 +431,7 @@ function CardsView(props: ViewProps) {
             game={game}
             drives={drives}
             sources={sources}
+            franchiseSuggestions={franchiseSuggestions}
             index={index}
             onUpdate={onUpdate}
             onToggleCounted={onToggleCounted}
@@ -398,8 +451,16 @@ interface ItemProps {
   game: Game
   drives: Drive[]
   sources: GameSource[]
+  franchiseSuggestions: string[]
   index: number
-  onUpdate: (id: string, name: string, sizeGb: number, sourceId?: string) => void
+  onUpdate: (
+    id: string,
+    name: string,
+    sizeGb: number,
+    sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
+  ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
@@ -410,18 +471,29 @@ interface ItemProps {
 
 function useGameEdit(
   game: Game,
-  onUpdate: (id: string, name: string, sizeGb: number, sourceId?: string) => void,
+  onUpdate: (
+    id: string,
+    name: string,
+    sizeGb: number,
+    sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
+  ) => void,
 ) {
   const [editing, setEditing] = useState(false)
   const [name, setName] = useState(game.name)
   const [size, setSize] = useState(String(game.sizeGb).replace('.', ','))
   const [sourceId, setSourceId] = useState(game.sourceId)
+  const [franchise, setFranchise] = useState(game.franchise ?? '')
+  const [releaseDate, setReleaseDate] = useState(game.releaseDate ?? '')
   const [error, setError] = useState('')
 
   function startEdit() {
     setName(game.name)
     setSize(String(game.sizeGb).replace('.', ','))
     setSourceId(game.sourceId)
+    setFranchise(game.franchise ?? '')
+    setReleaseDate(game.releaseDate ?? '')
     setError('')
     setEditing(true)
   }
@@ -445,7 +517,14 @@ function useGameEdit(
       return
     }
 
-    onUpdate(game.id, trimmed, sizeGb, sourceId)
+    onUpdate(
+      game.id,
+      trimmed,
+      sizeGb,
+      sourceId,
+      franchise.trim() || null,
+      releaseDate || null,
+    )
     setEditing(false)
   }
 
@@ -454,10 +533,14 @@ function useGameEdit(
     name,
     size,
     sourceId,
+    franchise,
+    releaseDate,
     error,
     setName,
     setSize,
     setSourceId,
+    setFranchise,
+    setReleaseDate,
     startEdit,
     cancel,
     save,
@@ -583,22 +666,32 @@ function GameEditor({
   name,
   size,
   sourceId,
+  franchise,
+  releaseDate,
   sources,
+  franchiseSuggestions,
   error,
   onNameChange,
   onSizeChange,
   onSourceChange,
+  onFranchiseChange,
+  onReleaseDateChange,
   onSave,
   onCancel,
 }: {
   name: string
   size: string
   sourceId: string
+  franchise: string
+  releaseDate: string
   sources: GameSource[]
+  franchiseSuggestions: string[]
   error: string
   onNameChange: (value: string) => void
   onSizeChange: (value: string) => void
   onSourceChange: (value: string) => void
+  onFranchiseChange: (value: string) => void
+  onReleaseDateChange: (value: string) => void
   onSave: (event: FormEvent) => void
   onCancel: () => void
 }) {
@@ -632,6 +725,28 @@ function GameEditor({
           ))}
         </select>
       </label>
+      <input
+        type="text"
+        list="game-edit-franchise-suggestions"
+        value={franchise}
+        onChange={(e) => onFranchiseChange(e.target.value)}
+        placeholder="Franquia"
+        aria-label="Franquia"
+        autoComplete="off"
+      />
+      <input
+        type="date"
+        value={releaseDate}
+        onChange={(e) => onReleaseDateChange(e.target.value)}
+        aria-label="Data de lançamento"
+      />
+      {franchiseSuggestions.length > 0 ? (
+        <datalist id="game-edit-franchise-suggestions">
+          {franchiseSuggestions.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+      ) : null}
       {error ? <p className="game-row__error">{error}</p> : null}
       <div className="game-row__actions">
         <button type="submit" className="btn btn--ghost">
@@ -691,6 +806,7 @@ function GameRow({
   game,
   drives,
   sources,
+  franchiseSuggestions,
   index,
   onUpdate,
   onToggleCounted,
@@ -712,11 +828,16 @@ function GameRow({
           name={edit.name}
           size={edit.size}
           sourceId={edit.sourceId}
+          franchise={edit.franchise}
+          releaseDate={edit.releaseDate}
           sources={sources}
+          franchiseSuggestions={franchiseSuggestions}
           error={edit.error}
           onNameChange={edit.setName}
           onSizeChange={edit.setSize}
           onSourceChange={edit.setSourceId}
+          onFranchiseChange={edit.setFranchise}
+          onReleaseDateChange={edit.setReleaseDate}
           onSave={edit.save}
           onCancel={edit.cancel}
         />
@@ -737,14 +858,7 @@ function GameRow({
       />
       <div className="game-row__main">
         <strong>{game.name}</strong>
-        <span>
-          {formatSize(game.sizeGb)} · {sourceName}
-          {game.wishlist
-            ? ' · desejo'
-            : !game.counted
-              ? ' · fora da conta'
-              : ''}
-        </span>
+        <span>{gameMetaLine(game, sourceName)}</span>
       </div>
       <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
       <DriveSelect game={game} drives={drives} onSetDrive={onSetDrive} />
@@ -761,6 +875,7 @@ function TableRow({
   game,
   drives,
   sources,
+  franchiseSuggestions,
   index,
   onUpdate,
   onToggleCounted,
@@ -776,16 +891,21 @@ function TableRow({
   if (edit.editing) {
     return (
       <tr className="game-table__edit-row" style={{ animationDelay: delay }}>
-        <td colSpan={7}>
+        <td colSpan={9}>
           <GameEditor
             name={edit.name}
             size={edit.size}
             sourceId={edit.sourceId}
+            franchise={edit.franchise}
+            releaseDate={edit.releaseDate}
             sources={sources}
+            franchiseSuggestions={franchiseSuggestions}
             error={edit.error}
             onNameChange={edit.setName}
             onSizeChange={edit.setSize}
             onSourceChange={edit.setSourceId}
+            onFranchiseChange={edit.setFranchise}
+            onReleaseDateChange={edit.setReleaseDate}
             onSave={edit.save}
             onCancel={edit.cancel}
           />
@@ -806,6 +926,8 @@ function TableRow({
       </td>
       <td className="game-table__name">{game.name}</td>
       <td className="game-table__size">{formatSize(game.sizeGb)}</td>
+      <td>{game.franchise ?? '—'}</td>
+      <td>{game.releaseDate ? formatReleaseDate(game.releaseDate) : '—'}</td>
       <td>
         <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
       </td>
@@ -828,6 +950,7 @@ function GameCard({
   game,
   drives,
   sources,
+  franchiseSuggestions,
   index,
   onUpdate,
   onToggleCounted,
@@ -839,6 +962,8 @@ function GameCard({
 }: ItemProps) {
   const edit = useGameEdit(game, onUpdate)
   const delay = `${Math.min(index, 12) * 30}ms`
+  const sourceName =
+    sources.find((source) => source.id === game.sourceId)?.name ?? 'Origem'
 
   return (
     <li className={gameCardClass(game)} style={{ animationDelay: delay }}>
@@ -847,11 +972,16 @@ function GameCard({
           name={edit.name}
           size={edit.size}
           sourceId={edit.sourceId}
+          franchise={edit.franchise}
+          releaseDate={edit.releaseDate}
           sources={sources}
+          franchiseSuggestions={franchiseSuggestions}
           error={edit.error}
           onNameChange={edit.setName}
           onSizeChange={edit.setSize}
           onSourceChange={edit.setSourceId}
+          onFranchiseChange={edit.setFranchise}
+          onReleaseDateChange={edit.setReleaseDate}
           onSave={edit.save}
           onCancel={edit.cancel}
         />
@@ -871,7 +1001,7 @@ function GameCard({
             />
           </div>
           <strong>{game.name}</strong>
-          <span className="game-card__size">{formatSize(game.sizeGb)}</span>
+          <span className="game-card__size">{gameMetaLine(game, sourceName)}</span>
           <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
           <DriveSelect game={game} drives={drives} onSetDrive={onSetDrive} />
         </>

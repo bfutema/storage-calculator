@@ -33,6 +33,10 @@ export interface Game {
   archived: boolean
   driveId: string
   sourceId: string
+  /** Series / franchise for chronological play order (e.g. Assassin's Creed). */
+  franchise: string | null
+  /** ISO date YYYY-MM-DD — used to order games within a franchise. */
+  releaseDate: string | null
   createdAt: number
 }
 

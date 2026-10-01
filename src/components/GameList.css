@@ -198,6 +198,22 @@
   display: grid;
   gap: 0.55rem;
   width: 100%;
+  grid-template-columns: 1fr;
+}
+
+@media (min-width: 640px) {
+  .game-row__edit {
+    grid-template-columns: minmax(10rem, 1.4fr) minmax(7rem, 9rem) minmax(8rem, 11rem);
+  }
+
+  .game-row__edit > input[type='text']:first-of-type {
+    grid-column: 1 / -1;
+  }
+
+  .game-row__edit .game-row__actions,
+  .game-row__edit .game-row__error {
+    grid-column: 1 / -1;
+  }
 }
 
 .game-row__edit input {

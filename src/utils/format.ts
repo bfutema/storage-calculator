@@ -46,6 +46,30 @@ export function createId(): string {
   return `${Date.now()}-${Math.random().toString(16).slice(2)}`
 }
 
+/** Accepts YYYY-MM-DD or empty; returns null when invalid/blank. */
+export function normalizeReleaseDate(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  if (!trimmed) return null
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(trimmed)) return null
+  const time = Date.parse(`${trimmed}T00:00:00`)
+  if (!Number.isFinite(time)) return null
+  return trimmed
+}
+
+export function formatReleaseDate(value: string | null | undefined): string {
+  if (!value) return ''
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(value)
+  if (!match) return value
+  return `${match[3]}/${match[2]}/${match[1]}`
+}
+
+export function normalizeFranchise(value: unknown): string | null {
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim()
+  return trimmed || null
+}
+
 export function toOsCapacityGb(
   advertisedGb: number,
   useBinaryConversion: boolean,

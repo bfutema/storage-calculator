@@ -3,7 +3,7 @@ import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { Drive, Game, GameSource } from '../types'
 import { formatSize } from '../utils/format'
 import { ArchiveIcon, ToolsIcon, TrashIcon } from './ActionIcons'
-import { GameForm } from './GameForm'
+import { GameForm, type GameFormValues } from './GameForm'
 import { GameList, type SortDirection, type SortField, type ViewMode } from './GameList'
 import { ViewModePicker } from './ViewModePicker'
 import { WishDriveModal } from './WishDriveModal'
@@ -11,6 +11,7 @@ import './GameLibrary.css'
 
 type StatusFilter = 'all' | 'counted' | 'wishlist' | 'skipped'
 type SizeFilter = 'all' | 'small' | 'medium' | 'large' | 'huge'
+const NO_FRANCHISE = '__none__'
 
 const VIEW_STORAGE_KEY = 'storage-calculator:view-mode'
 
@@ -31,8 +32,17 @@ interface GameLibraryProps {
     sizeGb: number,
     driveId?: string,
     sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
   ) => void
-  onUpdate: (id: string, name: string, sizeGb: number, sourceId?: string) => void
+  onUpdate: (
+    id: string,
+    name: string,
+    sizeGb: number,
+    sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
+  ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetCounted: (ids: string[], counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
@@ -81,6 +91,18 @@ function matchesSize(sizeGb: number, filter: SizeFilter): boolean {
   return true
 }
 
+function franchiseKey(game: Game): string {
+  return game.franchise?.trim() || ''
+}
+
+function compareByName(a: Game, b: Game): number {
+  return a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' })
+}
+
+/**
+ * Chronological sort stays scoped by franchise so play-order does not scramble
+ * the whole library (Assassin's Creed stays together, then God of War, etc.).
+ */
 function sortGames(
   games: Game[],
   field: SortField,
@@ -90,11 +112,41 @@ function sortGames(
 
   return [...games].sort((a, b) => {
     if (field === 'name') {
-      return (
-        a.name.localeCompare(b.name, 'pt-BR', { sensitivity: 'base' }) * factor
-      )
+      return compareByName(a, b) * factor
     }
-    return (a.sizeGb - b.sizeGb) * factor
+
+    if (field === 'size') {
+      const sizeDiff = (a.sizeGb - b.sizeGb) * factor
+      if (sizeDiff !== 0) return sizeDiff
+      return compareByName(a, b)
+    }
+
+    const franchiseA = franchiseKey(a)
+    const franchiseB = franchiseKey(b)
+    const aHasFranchise = franchiseA.length > 0
+    const bHasFranchise = franchiseB.length > 0
+
+    if (aHasFranchise !== bHasFranchise) {
+      return aHasFranchise ? -1 : 1
+    }
+
+    if (franchiseA !== franchiseB) {
+      return franchiseA.localeCompare(franchiseB, 'pt-BR', {
+        sensitivity: 'base',
+      })
+    }
+
+    const dateA = a.releaseDate ?? ''
+    const dateB = b.releaseDate ?? ''
+    if (dateA && dateB && dateA !== dateB) {
+      return dateA < dateB ? -factor : factor
+    }
+    if (dateA !== dateB) {
+      // Dated games come first within the franchise.
+      return dateA ? -1 : 1
+    }
+
+    return compareByName(a, b)
   })
 }
 
@@ -129,6 +181,7 @@ export function GameLibrary({
   const [sizeFilter, setSizeFilter] = useState<SizeFilter>('all')
   const [driveFilter, setDriveFilter] = useState<string>('all')
   const [sourceFilter, setSourceFilter] = useState<string>('all')
+  const [franchiseFilter, setFranchiseFilter] = useState<string>('all')
   const [viewMode, setViewMode] = useState<ViewMode>(loadViewMode)
   const [sortField, setSortField] = useState<SortField>('size')
   const [sortDirection, setSortDirection] = useState<SortDirection>('desc')
@@ -156,6 +209,17 @@ export function GameLibrary({
     [games],
   )
 
+  const franchiseSuggestions = useMemo(() => {
+    const names = new Set<string>()
+    for (const game of games) {
+      const name = game.franchise?.trim()
+      if (name) names.add(name)
+    }
+    return [...names].sort((a, b) =>
+      a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }),
+    )
+  }, [games])
+
   const countedGames = activeGames.filter((game) => game.counted)
   const wishlistGames = activeGames.filter((game) => game.wishlist)
   const countedTotal = countedGames.reduce((sum, game) => sum + game.sizeGb, 0)
@@ -167,13 +231,15 @@ export function GameLibrary({
     statusFilter !== 'all' ||
     sizeFilter !== 'all' ||
     driveFilter !== 'all' ||
-    sourceFilter !== 'all'
+    sourceFilter !== 'all' ||
+    franchiseFilter !== 'all'
 
   const activeToolCount = [
     statusFilter !== 'all',
     sizeFilter !== 'all',
     driveFilter !== 'all',
     sourceFilter !== 'all',
+    franchiseFilter !== 'all',
   ].filter(Boolean).length
 
   const visible = useMemo(() => {
@@ -190,8 +256,22 @@ export function GameLibrary({
       }
       if (driveFilter !== 'all' && game.driveId !== driveFilter) return false
       if (sourceFilter !== 'all' && game.sourceId !== sourceFilter) return false
+      if (franchiseFilter === NO_FRANCHISE && franchiseKey(game)) return false
+      if (
+        franchiseFilter !== 'all' &&
+        franchiseFilter !== NO_FRANCHISE &&
+        franchiseKey(game) !== franchiseFilter
+      ) {
+        return false
+      }
       if (!matchesSize(game.sizeGb, sizeFilter)) return false
-      if (needle && !normalizeText(game.name).includes(needle)) return false
+      if (
+        needle &&
+        !normalizeText(game.name).includes(needle) &&
+        !normalizeText(game.franchise ?? '').includes(needle)
+      ) {
+        return false
+      }
       return true
     })
 
@@ -203,6 +283,7 @@ export function GameLibrary({
     sizeFilter,
     driveFilter,
     sourceFilter,
+    franchiseFilter,
     sortField,
     sortDirection,
   ])
@@ -220,13 +301,21 @@ export function GameLibrary({
     return () => document.removeEventListener('keydown', handleKey)
   }, [drawerOpen, archiveOpen])
 
-  function handleAdd(name: string, sizeGb: number, sourceId: string) {
-    onAdd(name, sizeGb, defaultDriveId, sourceId)
+  function handleAdd(values: GameFormValues) {
+    onAdd(
+      values.name,
+      values.sizeGb,
+      defaultDriveId,
+      values.sourceId,
+      values.franchise,
+      values.releaseDate,
+    )
     setQuery('')
     setStatusFilter('all')
     setSizeFilter('all')
     setDriveFilter('all')
     setSourceFilter('all')
+    setFranchiseFilter('all')
   }
 
   function handleViewChange(mode: ViewMode) {
@@ -244,7 +333,7 @@ export function GameLibrary({
       return
     }
     setSortField(field)
-    setSortDirection(field === 'name' ? 'asc' : 'desc')
+    setSortDirection(field === 'size' ? 'desc' : 'asc')
   }
 
   function clearFilters() {
@@ -253,6 +342,7 @@ export function GameLibrary({
     setSizeFilter('all')
     setDriveFilter('all')
     setSourceFilter('all')
+    setFranchiseFilter('all')
   }
 
   function toggleStatus(next: StatusFilter) {
@@ -269,6 +359,10 @@ export function GameLibrary({
 
   function toggleSource(next: string) {
     setSourceFilter((prev) => (prev === next ? 'all' : next))
+  }
+
+  function toggleFranchise(next: string) {
+    setFranchiseFilter((prev) => (prev === next ? 'all' : next))
   }
 
   function handleCreateSource() {
@@ -347,6 +441,34 @@ export function GameLibrary({
           </button>
         ))}
       </div>
+
+      {franchiseSuggestions.length > 0 ||
+      activeGames.some((game) => !franchiseKey(game)) ? (
+        <div className="library__filter-group" role="group" aria-label="Franquia">
+          <span>Franquia</span>
+          {franchiseSuggestions.map((franchise) => (
+            <button
+              key={franchise}
+              type="button"
+              className={`filter-chip ${franchiseFilter === franchise ? 'is-active' : ''}`}
+              onClick={() => toggleFranchise(franchise)}
+              aria-pressed={franchiseFilter === franchise}
+            >
+              {franchise}
+            </button>
+          ))}
+          {activeGames.some((game) => !franchiseKey(game)) ? (
+            <button
+              type="button"
+              className={`filter-chip ${franchiseFilter === NO_FRANCHISE ? 'is-active' : ''}`}
+              onClick={() => toggleFranchise(NO_FRANCHISE)}
+              aria-pressed={franchiseFilter === NO_FRANCHISE}
+            >
+              Sem franquia
+            </button>
+          ) : null}
+        </div>
+      ) : null}
 
       <div className="library__filter-group" role="group" aria-label="Situação">
         <span>Situação</span>
@@ -590,6 +712,20 @@ export function GameLibrary({
         Tamanho
         {sortField === 'size' ? (sortDirection === 'asc' ? ' ↑' : ' ↓') : ''}
       </button>
+      <button
+        type="button"
+        className={`filter-chip ${sortField === 'release' ? 'is-active' : ''}`}
+        onClick={() => handleSort('release')}
+        aria-pressed={sortField === 'release'}
+        title="Agrupa por franquia e ordena pela data de lançamento"
+      >
+        Cronológica
+        {sortField === 'release'
+          ? sortDirection === 'asc'
+            ? ' ↑'
+            : ' ↓'
+          : ''}
+      </button>
     </div>
   )
 
@@ -598,6 +734,7 @@ export function GameLibrary({
       games={visible}
       drives={drives}
       sources={sources}
+      franchiseSuggestions={franchiseSuggestions}
       viewMode={viewMode}
       sortField={sortField}
       sortDirection={sortDirection}
@@ -767,6 +904,7 @@ export function GameLibrary({
         <GameForm
           className="game-form--wide"
           sources={sources}
+          franchiseSuggestions={franchiseSuggestions}
           onAdd={handleAdd}
           onAddSource={onAddSource}
         />

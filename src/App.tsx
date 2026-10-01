@@ -337,8 +337,24 @@ function App() {
             open={addOpen}
             onClose={() => setAddOpen(false)}
             sources={state.sources}
-            onAdd={(name, sizeGb, sourceId) =>
-              addGame(name, sizeGb, effectiveDriveId, sourceId)
+            franchiseSuggestions={[
+              ...new Set(
+                state.games
+                  .map((game) => game.franchise?.trim())
+                  .filter((name): name is string => Boolean(name)),
+              ),
+            ].sort((a, b) =>
+              a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }),
+            )}
+            onAdd={(values) =>
+              addGame(
+                values.name,
+                values.sizeGb,
+                effectiveDriveId,
+                values.sourceId,
+                values.franchise,
+                values.releaseDate,
+              )
             }
             onAddSource={addSource}
           />

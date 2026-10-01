@@ -13,7 +13,11 @@ import {
   type SpaceCategory,
   type StorageType,
 } from '../types'
-import { createId } from '../utils/format'
+import {
+  createId,
+  normalizeFranchise,
+  normalizeReleaseDate,
+} from '../utils/format'
 
 const STORAGE_KEY = 'storage-calculator:library-v1'
 
@@ -128,6 +132,8 @@ function normalizeGame(
       typeof game.sourceId === 'string' && game.sourceId
         ? game.sourceId
         : fallbackSourceId,
+    franchise: normalizeFranchise(game.franchise),
+    releaseDate: normalizeReleaseDate(game.releaseDate),
     createdAt: game.createdAt,
   }
 }
@@ -493,6 +499,8 @@ export function useLibrary() {
     sizeGb: number,
     driveId?: string,
     sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
   ) {
     setState((prev) => {
       const fallback =
@@ -518,6 +526,8 @@ export function useLibrary() {
         archived: false,
         driveId: resolvedDriveId,
         sourceId: resolvedSourceId,
+        franchise: normalizeFranchise(franchise),
+        releaseDate: normalizeReleaseDate(releaseDate),
         createdAt: Date.now(),
       }
 
@@ -530,6 +540,8 @@ export function useLibrary() {
     name: string,
     sizeGb: number,
     sourceId?: string,
+    franchise?: string | null,
+    releaseDate?: string | null,
   ) {
     setState((prev) => ({
       ...prev,
@@ -544,6 +556,14 @@ export function useLibrary() {
           name: name.trim(),
           sizeGb,
           sourceId: nextSource,
+          franchise:
+            franchise === undefined
+              ? game.franchise
+              : normalizeFranchise(franchise),
+          releaseDate:
+            releaseDate === undefined
+              ? game.releaseDate
+              : normalizeReleaseDate(releaseDate),
         }
       }),
     }))

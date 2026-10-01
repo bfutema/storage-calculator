@@ -7,10 +7,19 @@ import {
 import { parseSizeInput } from '../utils/format'
 import './GameForm.css'
 
+export interface GameFormValues {
+  name: string
+  sizeGb: number
+  sourceId: string
+  franchise: string | null
+  releaseDate: string | null
+}
+
 interface GameFormProps {
   sources: GameSource[]
+  franchiseSuggestions?: string[]
   defaultSourceId?: string
-  onAdd: (name: string, sizeGb: number, sourceId: string) => void
+  onAdd: (values: GameFormValues) => void
   onAddSource?: (name: string) => string | null
   className?: string
   autoFocus?: boolean
@@ -18,6 +27,7 @@ interface GameFormProps {
 
 export function GameForm({
   sources,
+  franchiseSuggestions = [],
   defaultSourceId,
   onAdd,
   onAddSource,
@@ -36,6 +46,8 @@ export function GameForm({
   const [unit, setUnit] = useState<SizeUnit>('GB')
   const [sourceId, setSourceId] = useState(initialSource)
   const [customSource, setCustomSource] = useState('')
+  const [franchise, setFranchise] = useState('')
+  const [releaseDate, setReleaseDate] = useState('')
   const [error, setError] = useState('')
 
   function handleSubmit(event: FormEvent) {
@@ -67,10 +79,18 @@ export function GameForm({
       return
     }
 
-    onAdd(trimmed, sizeGb, resolvedSourceId)
+    onAdd({
+      name: trimmed,
+      sizeGb,
+      sourceId: resolvedSourceId,
+      franchise: franchise.trim() || null,
+      releaseDate: releaseDate || null,
+    })
     setName('')
     setSize('')
     setCustomSource('')
+    setFranchise('')
+    setReleaseDate('')
     setSourceId(resolvedSourceId)
     setError('')
   }
@@ -132,6 +152,28 @@ export function GameForm({
           </select>
         </label>
 
+        <label className="field">
+          <span>Franquia</span>
+          <input
+            type="text"
+            list="game-franchise-suggestions"
+            value={franchise}
+            onChange={(e) => setFranchise(e.target.value)}
+            placeholder="Ex.: Assassin's Creed"
+            autoComplete="off"
+          />
+        </label>
+
+        <label className="field">
+          <span>Lançamento</span>
+          <input
+            type="date"
+            value={releaseDate}
+            onChange={(e) => setReleaseDate(e.target.value)}
+            aria-label="Data de lançamento"
+          />
+        </label>
+
         {sourceId === '__new__' ? (
           <label className="field field--span">
             <span>Nome da origem</span>
@@ -145,6 +187,14 @@ export function GameForm({
           </label>
         ) : null}
       </div>
+
+      {franchiseSuggestions.length > 0 ? (
+        <datalist id="game-franchise-suggestions">
+          {franchiseSuggestions.map((item) => (
+            <option key={item} value={item} />
+          ))}
+        </datalist>
+      ) : null}
 
       {error ? <p className="game-form__error">{error}</p> : null}
 

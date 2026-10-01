@@ -35,7 +35,12 @@ export interface Game {
   sourceId: string
   /** Series / franchise for chronological play order (e.g. Assassin's Creed). */
   franchise: string | null
-  /** ISO date YYYY-MM-DD — used to order games within a franchise. */
+  /**
+   * Manual play-order within the franchise (story chronology).
+   * Independent from releaseDate — e.g. AC Odyssey can be 1 even if released later.
+   */
+  chronologyOrder: number | null
+  /** ISO date YYYY-MM-DD — used to order games by release within a franchise. */
   releaseDate: string | null
   createdAt: number
 }

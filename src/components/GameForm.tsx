@@ -4,7 +4,7 @@ import {
   type GameSource,
   type SizeUnit,
 } from '../types'
-import { parseSizeInput } from '../utils/format'
+import { parseSizeInput, normalizeChronologyOrder } from '../utils/format'
 import './GameForm.css'
 
 export interface GameFormValues {
@@ -12,6 +12,7 @@ export interface GameFormValues {
   sizeGb: number
   sourceId: string
   franchise: string | null
+  chronologyOrder: number | null
   releaseDate: string | null
 }
 
@@ -47,6 +48,7 @@ export function GameForm({
   const [sourceId, setSourceId] = useState(initialSource)
   const [customSource, setCustomSource] = useState('')
   const [franchise, setFranchise] = useState('')
+  const [chronologyOrder, setChronologyOrder] = useState('')
   const [releaseDate, setReleaseDate] = useState('')
   const [error, setError] = useState('')
 
@@ -61,6 +63,11 @@ export function GameForm({
     }
     if (sizeGb === null || sizeGb <= 0) {
       setError('Informe um tamanho válido.')
+      return
+    }
+
+    if (chronologyOrder.trim() && normalizeChronologyOrder(chronologyOrder) === null) {
+      setError('Ordem cronológica inválida.')
       return
     }
 
@@ -84,12 +91,14 @@ export function GameForm({
       sizeGb,
       sourceId: resolvedSourceId,
       franchise: franchise.trim() || null,
+      chronologyOrder: normalizeChronologyOrder(chronologyOrder),
       releaseDate: releaseDate || null,
     })
     setName('')
     setSize('')
     setCustomSource('')
     setFranchise('')
+    setChronologyOrder('')
     setReleaseDate('')
     setSourceId(resolvedSourceId)
     setError('')
@@ -161,6 +170,18 @@ export function GameForm({
             onChange={(e) => setFranchise(e.target.value)}
             placeholder="Ex.: Assassin's Creed"
             autoComplete="off"
+          />
+        </label>
+
+        <label className="field field--order">
+          <span>Ordem cronológica</span>
+          <input
+            type="text"
+            inputMode="decimal"
+            value={chronologyOrder}
+            onChange={(e) => setChronologyOrder(e.target.value)}
+            placeholder="1"
+            aria-label="Ordem cronológica na franquia"
           />
         </label>
 

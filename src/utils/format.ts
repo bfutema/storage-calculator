@@ -70,6 +70,18 @@ export function normalizeFranchise(value: unknown): string | null {
   return trimmed || null
 }
 
+/** Accepts a finite non-negative number; blank/invalid → null. */
+export function normalizeChronologyOrder(value: unknown): number | null {
+  if (typeof value === 'number') {
+    return Number.isFinite(value) && value >= 0 ? value : null
+  }
+  if (typeof value !== 'string') return null
+  const trimmed = value.trim().replace(',', '.')
+  if (!trimmed) return null
+  const parsed = Number(trimmed)
+  return Number.isFinite(parsed) && parsed >= 0 ? parsed : null
+}
+
 export function toOsCapacityGb(
   advertisedGb: number,
   useBinaryConversion: boolean,

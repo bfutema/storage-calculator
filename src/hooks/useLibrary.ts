@@ -15,6 +15,7 @@ import {
 } from '../types'
 import {
   createId,
+  normalizeChronologyOrder,
   normalizeFranchise,
   normalizeReleaseDate,
 } from '../utils/format'
@@ -133,6 +134,7 @@ function normalizeGame(
         ? game.sourceId
         : fallbackSourceId,
     franchise: normalizeFranchise(game.franchise),
+    chronologyOrder: normalizeChronologyOrder(game.chronologyOrder),
     releaseDate: normalizeReleaseDate(game.releaseDate),
     createdAt: game.createdAt,
   }
@@ -501,6 +503,7 @@ export function useLibrary() {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) {
     setState((prev) => {
       const fallback =
@@ -527,6 +530,7 @@ export function useLibrary() {
         driveId: resolvedDriveId,
         sourceId: resolvedSourceId,
         franchise: normalizeFranchise(franchise),
+        chronologyOrder: normalizeChronologyOrder(chronologyOrder),
         releaseDate: normalizeReleaseDate(releaseDate),
         createdAt: Date.now(),
       }
@@ -542,6 +546,7 @@ export function useLibrary() {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) {
     setState((prev) => ({
       ...prev,
@@ -560,6 +565,10 @@ export function useLibrary() {
             franchise === undefined
               ? game.franchise
               : normalizeFranchise(franchise),
+          chronologyOrder:
+            chronologyOrder === undefined
+              ? game.chronologyOrder
+              : normalizeChronologyOrder(chronologyOrder),
           releaseDate:
             releaseDate === undefined
               ? game.releaseDate

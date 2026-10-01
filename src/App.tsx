@@ -354,6 +354,7 @@ function App() {
                 values.sourceId,
                 values.franchise,
                 values.releaseDate,
+                values.chronologyOrder,
               )
             }
             onAddSource={addSource}

@@ -1,12 +1,12 @@
 import { useState, type FormEvent } from 'react'
 import type { Drive, Game, GameSource } from '../types'
-import { formatReleaseDate, formatSize, parseSizeInput } from '../utils/format'
+import { formatReleaseDate, formatSize, normalizeChronologyOrder, parseSizeInput } from '../utils/format'
 import { ArchiveIcon, EditIcon, TrashIcon } from './ActionIcons'
 import { WishDriveModal } from './WishDriveModal'
 import './GameList.css'
 
 export type ViewMode = 'list' | 'table' | 'cards'
-export type SortField = 'name' | 'size' | 'release'
+export type SortField = 'name' | 'size' | 'chronology' | 'release'
 export type SortDirection = 'asc' | 'desc'
 
 interface GameListProps {
@@ -27,6 +27,7 @@ interface GameListProps {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
@@ -102,6 +103,7 @@ interface ViewProps {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
@@ -132,6 +134,9 @@ function gameCardClass(game: Game): string {
 function gameMetaLine(game: Game, sourceName: string): string {
   const parts = [formatSize(game.sizeGb), sourceName]
   if (game.franchise) parts.push(game.franchise)
+  if (typeof game.chronologyOrder === 'number') {
+    parts.push(`#${game.chronologyOrder}`)
+  }
   if (game.releaseDate) parts.push(formatReleaseDate(game.releaseDate))
   if (game.wishlist) parts.push('desejo')
   else if (!game.counted) parts.push('fora da conta')
@@ -162,6 +167,13 @@ function SortButtons({
       />
       <SortButton
         label="Cronológica"
+        field="chronology"
+        sortField={sortField}
+        sortDirection={sortDirection}
+        onSort={onSort}
+      />
+      <SortButton
+        label="Lançamento"
         field="release"
         sortField={sortField}
         sortDirection={sortDirection}
@@ -357,6 +369,18 @@ function TableView(props: ViewProps) {
             <th>
               <button
                 type="button"
+                className={`table-sort ${sortField === 'chronology' ? 'is-active' : ''}`}
+                onClick={() => onSort('chronology')}
+              >
+                Cronologia
+                {sortField === 'chronology' ? (
+                  <em aria-hidden="true">{sortDirection === 'asc' ? '↑' : '↓'}</em>
+                ) : null}
+              </button>
+            </th>
+            <th>
+              <button
+                type="button"
                 className={`table-sort ${sortField === 'release' ? 'is-active' : ''}`}
                 onClick={() => onSort('release')}
               >
@@ -460,6 +484,7 @@ interface ItemProps {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
@@ -478,6 +503,7 @@ function useGameEdit(
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) => void,
 ) {
   const [editing, setEditing] = useState(false)
@@ -485,6 +511,11 @@ function useGameEdit(
   const [size, setSize] = useState(String(game.sizeGb).replace('.', ','))
   const [sourceId, setSourceId] = useState(game.sourceId)
   const [franchise, setFranchise] = useState(game.franchise ?? '')
+  const [chronologyOrder, setChronologyOrder] = useState(
+    typeof game.chronologyOrder === 'number'
+      ? String(game.chronologyOrder).replace('.', ',')
+      : '',
+  )
   const [releaseDate, setReleaseDate] = useState(game.releaseDate ?? '')
   const [error, setError] = useState('')
 
@@ -493,6 +524,11 @@ function useGameEdit(
     setSize(String(game.sizeGb).replace('.', ','))
     setSourceId(game.sourceId)
     setFranchise(game.franchise ?? '')
+    setChronologyOrder(
+      typeof game.chronologyOrder === 'number'
+        ? String(game.chronologyOrder).replace('.', ',')
+        : '',
+    )
     setReleaseDate(game.releaseDate ?? '')
     setError('')
     setEditing(true)
@@ -517,6 +553,14 @@ function useGameEdit(
       return
     }
 
+    const order = chronologyOrder.trim()
+      ? normalizeChronologyOrder(chronologyOrder)
+      : null
+    if (chronologyOrder.trim() && order === null) {
+      setError('Ordem cronológica inválida.')
+      return
+    }
+
     onUpdate(
       game.id,
       trimmed,
@@ -524,6 +568,7 @@ function useGameEdit(
       sourceId,
       franchise.trim() || null,
       releaseDate || null,
+      order,
     )
     setEditing(false)
   }
@@ -534,12 +579,14 @@ function useGameEdit(
     size,
     sourceId,
     franchise,
+    chronologyOrder,
     releaseDate,
     error,
     setName,
     setSize,
     setSourceId,
     setFranchise,
+    setChronologyOrder,
     setReleaseDate,
     startEdit,
     cancel,
@@ -667,6 +714,7 @@ function GameEditor({
   size,
   sourceId,
   franchise,
+  chronologyOrder,
   releaseDate,
   sources,
   franchiseSuggestions,
@@ -675,6 +723,7 @@ function GameEditor({
   onSizeChange,
   onSourceChange,
   onFranchiseChange,
+  onChronologyOrderChange,
   onReleaseDateChange,
   onSave,
   onCancel,
@@ -683,6 +732,7 @@ function GameEditor({
   size: string
   sourceId: string
   franchise: string
+  chronologyOrder: string
   releaseDate: string
   sources: GameSource[]
   franchiseSuggestions: string[]
@@ -691,6 +741,7 @@ function GameEditor({
   onSizeChange: (value: string) => void
   onSourceChange: (value: string) => void
   onFranchiseChange: (value: string) => void
+  onChronologyOrderChange: (value: string) => void
   onReleaseDateChange: (value: string) => void
   onSave: (event: FormEvent) => void
   onCancel: () => void
@@ -733,6 +784,14 @@ function GameEditor({
         placeholder="Franquia"
         aria-label="Franquia"
         autoComplete="off"
+      />
+      <input
+        type="text"
+        inputMode="decimal"
+        value={chronologyOrder}
+        onChange={(e) => onChronologyOrderChange(e.target.value)}
+        placeholder="Ordem #"
+        aria-label="Ordem cronológica"
       />
       <input
         type="date"
@@ -829,6 +888,7 @@ function GameRow({
           size={edit.size}
           sourceId={edit.sourceId}
           franchise={edit.franchise}
+          chronologyOrder={edit.chronologyOrder}
           releaseDate={edit.releaseDate}
           sources={sources}
           franchiseSuggestions={franchiseSuggestions}
@@ -837,6 +897,7 @@ function GameRow({
           onSizeChange={edit.setSize}
           onSourceChange={edit.setSourceId}
           onFranchiseChange={edit.setFranchise}
+          onChronologyOrderChange={edit.setChronologyOrder}
           onReleaseDateChange={edit.setReleaseDate}
           onSave={edit.save}
           onCancel={edit.cancel}
@@ -891,12 +952,13 @@ function TableRow({
   if (edit.editing) {
     return (
       <tr className="game-table__edit-row" style={{ animationDelay: delay }}>
-        <td colSpan={9}>
+        <td colSpan={10}>
           <GameEditor
             name={edit.name}
             size={edit.size}
             sourceId={edit.sourceId}
             franchise={edit.franchise}
+            chronologyOrder={edit.chronologyOrder}
             releaseDate={edit.releaseDate}
             sources={sources}
             franchiseSuggestions={franchiseSuggestions}
@@ -905,6 +967,7 @@ function TableRow({
             onSizeChange={edit.setSize}
             onSourceChange={edit.setSourceId}
             onFranchiseChange={edit.setFranchise}
+            onChronologyOrderChange={edit.setChronologyOrder}
             onReleaseDateChange={edit.setReleaseDate}
             onSave={edit.save}
             onCancel={edit.cancel}
@@ -927,6 +990,9 @@ function TableRow({
       <td className="game-table__name">{game.name}</td>
       <td className="game-table__size">{formatSize(game.sizeGb)}</td>
       <td>{game.franchise ?? '—'}</td>
+      <td>
+        {typeof game.chronologyOrder === 'number' ? game.chronologyOrder : '—'}
+      </td>
       <td>{game.releaseDate ? formatReleaseDate(game.releaseDate) : '—'}</td>
       <td>
         <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
@@ -973,6 +1039,7 @@ function GameCard({
           size={edit.size}
           sourceId={edit.sourceId}
           franchise={edit.franchise}
+          chronologyOrder={edit.chronologyOrder}
           releaseDate={edit.releaseDate}
           sources={sources}
           franchiseSuggestions={franchiseSuggestions}
@@ -981,6 +1048,7 @@ function GameCard({
           onSizeChange={edit.setSize}
           onSourceChange={edit.setSourceId}
           onFranchiseChange={edit.setFranchise}
+          onChronologyOrderChange={edit.setChronologyOrder}
           onReleaseDateChange={edit.setReleaseDate}
           onSave={edit.save}
           onCancel={edit.cancel}

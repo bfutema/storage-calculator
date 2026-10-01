@@ -34,6 +34,7 @@ interface GameLibraryProps {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) => void
   onUpdate: (
     id: string,
@@ -42,6 +43,7 @@ interface GameLibraryProps {
     sourceId?: string,
     franchise?: string | null,
     releaseDate?: string | null,
+    chronologyOrder?: number | null,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetCounted: (ids: string[], counted: boolean) => void
@@ -100,9 +102,38 @@ function compareByName(a: Game, b: Game): number {
 }
 
 /**
- * Chronological sort stays scoped by franchise so play-order does not scramble
- * the whole library (Assassin's Creed stays together, then God of War, etc.).
+ * Franchise-scoped sorts keep series together so play/release order does not
+ * scramble the whole library (Assassin's Creed stays together, then God of War…).
  */
+function compareWithinFranchise(
+  a: Game,
+  b: Game,
+  field: 'chronology' | 'release',
+  factor: number,
+): number {
+  if (field === 'chronology') {
+    const orderA = a.chronologyOrder
+    const orderB = b.chronologyOrder
+    const aHas = typeof orderA === 'number'
+    const bHas = typeof orderB === 'number'
+    if (aHas && bHas && orderA !== orderB) {
+      return ((orderA as number) - (orderB as number)) * factor
+    }
+    if (aHas !== bHas) return aHas ? -1 : 1
+    return compareByName(a, b)
+  }
+
+  const dateA = a.releaseDate ?? ''
+  const dateB = b.releaseDate ?? ''
+  if (dateA && dateB && dateA !== dateB) {
+    return dateA < dateB ? -factor : factor
+  }
+  if (dateA !== dateB) {
+    return dateA ? -1 : 1
+  }
+  return compareByName(a, b)
+}
+
 function sortGames(
   games: Game[],
   field: SortField,
@@ -136,17 +167,7 @@ function sortGames(
       })
     }
 
-    const dateA = a.releaseDate ?? ''
-    const dateB = b.releaseDate ?? ''
-    if (dateA && dateB && dateA !== dateB) {
-      return dateA < dateB ? -factor : factor
-    }
-    if (dateA !== dateB) {
-      // Dated games come first within the franchise.
-      return dateA ? -1 : 1
-    }
-
-    return compareByName(a, b)
+    return compareWithinFranchise(a, b, field, factor)
   })
 }
 
@@ -309,6 +330,7 @@ export function GameLibrary({
       values.sourceId,
       values.franchise,
       values.releaseDate,
+      values.chronologyOrder,
     )
     setQuery('')
     setStatusFilter('all')
@@ -714,12 +736,26 @@ export function GameLibrary({
       </button>
       <button
         type="button"
+        className={`filter-chip ${sortField === 'chronology' ? 'is-active' : ''}`}
+        onClick={() => handleSort('chronology')}
+        aria-pressed={sortField === 'chronology'}
+        title="Agrupa por franquia e ordena pelo número de cronologia"
+      >
+        Cronológica
+        {sortField === 'chronology'
+          ? sortDirection === 'asc'
+            ? ' ↑'
+            : ' ↓'
+          : ''}
+      </button>
+      <button
+        type="button"
         className={`filter-chip ${sortField === 'release' ? 'is-active' : ''}`}
         onClick={() => handleSort('release')}
         aria-pressed={sortField === 'release'}
         title="Agrupa por franquia e ordena pela data de lançamento"
       >
-        Cronológica
+        Lançamento
         {sortField === 'release'
           ? sortDirection === 'asc'
             ? ' ↑'

@@ -27,4 +27,5 @@ O script faz o build, publica a pasta `dist/` na branch `gh-pages` e empurra par
 - Folga percentual para updates/shaders
 - Soma da biblioteca de jogos
 - Espaço livre / faltando e recomendação de capacidade
-- Franquia e data de lançamento por jogo, com ordenação cronológica agrupada por franquia (ordem de jogatina sem misturar a biblioteca inteira)
+- Franquia, ordem cronológica (número de jogatina) e data de lançamento por jogo
+- Ordenação cronológica e por lançamento agrupadas por franquia (sem misturar a biblioteca inteira)

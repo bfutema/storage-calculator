@@ -14,6 +14,7 @@ export interface GameFormValues {
   franchise: string | null
   chronologyOrder: number | null
   releaseDate: string | null
+  hasDenuvo: boolean
 }
 
 interface GameFormProps {
@@ -50,6 +51,7 @@ export function GameForm({
   const [franchise, setFranchise] = useState('')
   const [chronologyOrder, setChronologyOrder] = useState('')
   const [releaseDate, setReleaseDate] = useState('')
+  const [hasDenuvo, setHasDenuvo] = useState(false)
   const [error, setError] = useState('')
 
   function handleSubmit(event: FormEvent) {
@@ -93,6 +95,7 @@ export function GameForm({
       franchise: franchise.trim() || null,
       chronologyOrder: normalizeChronologyOrder(chronologyOrder),
       releaseDate: releaseDate || null,
+      hasDenuvo,
     })
     setName('')
     setSize('')
@@ -100,6 +103,7 @@ export function GameForm({
     setFranchise('')
     setChronologyOrder('')
     setReleaseDate('')
+    setHasDenuvo(false)
     setSourceId(resolvedSourceId)
     setError('')
   }
@@ -193,6 +197,18 @@ export function GameForm({
             onChange={(e) => setReleaseDate(e.target.value)}
             aria-label="Data de lançamento"
           />
+        </label>
+
+        <label className="field field--check">
+          <span>Denuvo</span>
+          <label className="check-row">
+            <input
+              type="checkbox"
+              checked={hasDenuvo}
+              onChange={(e) => setHasDenuvo(e.target.checked)}
+            />
+            <span>Proteção DRM presente</span>
+          </label>
         </label>
 
         {sourceId === '__new__' ? (

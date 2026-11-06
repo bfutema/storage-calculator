@@ -28,11 +28,13 @@ interface GameListProps {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
   onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+  onToggleDenuvo: (id: string, hasDenuvo: boolean) => void
   onArchive: (id: string) => void
   onRemove: (id: string) => void
 }
@@ -53,6 +55,7 @@ export function GameList({
   onSetDrive,
   onSetSource,
   onToggleWishlist,
+  onToggleDenuvo,
   onArchive,
   onRemove,
 }: GameListProps) {
@@ -78,6 +81,7 @@ export function GameList({
     onSetDrive,
     onSetSource,
     onToggleWishlist,
+    onToggleDenuvo,
     onArchive,
     onRemove,
   }
@@ -104,11 +108,13 @@ interface ViewProps {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
   onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+  onToggleDenuvo: (id: string, hasDenuvo: boolean) => void
   onArchive: (id: string) => void
   onRemove: (id: string) => void
 }
@@ -141,6 +147,15 @@ function gameMetaLine(game: Game, sourceName: string): string {
   if (game.wishlist) parts.push('desejo')
   else if (!game.counted) parts.push('fora da conta')
   return parts.join(' · ')
+}
+
+function DenuvoBadge({ game }: { game: Game }) {
+  if (!game.hasDenuvo) return null
+  return (
+    <span className="denuvo-badge" title="Proteção Denuvo">
+      Denuvo
+    </span>
+  )
 }
 
 function SortButtons({
@@ -281,6 +296,7 @@ function ListView(props: ViewProps) {
     onSetDrive,
     onSetSource,
     onToggleWishlist,
+    onToggleDenuvo,
     onArchive,
     onRemove,
   } = props
@@ -308,6 +324,7 @@ function ListView(props: ViewProps) {
             onSetDrive={onSetDrive}
             onSetSource={onSetSource}
             onToggleWishlist={onToggleWishlist}
+            onToggleDenuvo={onToggleDenuvo}
             onArchive={onArchive}
             onRemove={onRemove}
           />
@@ -331,6 +348,7 @@ function TableView(props: ViewProps) {
     onSetDrive,
     onSetSource,
     onToggleWishlist,
+    onToggleDenuvo,
     onArchive,
     onRemove,
   } = props
@@ -390,6 +408,7 @@ function TableView(props: ViewProps) {
                 ) : null}
               </button>
             </th>
+            <th>Denuvo</th>
             <th>Origem</th>
             <th>SSD</th>
             <th>Situação</th>
@@ -410,6 +429,7 @@ function TableView(props: ViewProps) {
               onSetDrive={onSetDrive}
               onSetSource={onSetSource}
               onToggleWishlist={onToggleWishlist}
+              onToggleDenuvo={onToggleDenuvo}
               onArchive={onArchive}
               onRemove={onRemove}
             />
@@ -435,6 +455,7 @@ function CardsView(props: ViewProps) {
     onSetDrive,
     onSetSource,
     onToggleWishlist,
+    onToggleDenuvo,
     onArchive,
     onRemove,
   } = props
@@ -462,6 +483,7 @@ function CardsView(props: ViewProps) {
             onSetDrive={onSetDrive}
             onSetSource={onSetSource}
             onToggleWishlist={onToggleWishlist}
+            onToggleDenuvo={onToggleDenuvo}
             onArchive={onArchive}
             onRemove={onRemove}
           />
@@ -485,11 +507,13 @@ interface ItemProps {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetDrive: (id: string, driveId: string) => void
   onSetSource: (id: string, sourceId: string) => void
   onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+  onToggleDenuvo: (id: string, hasDenuvo: boolean) => void
   onArchive: (id: string) => void
   onRemove: (id: string) => void
 }
@@ -504,6 +528,7 @@ function useGameEdit(
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) => void,
 ) {
   const [editing, setEditing] = useState(false)
@@ -517,6 +542,7 @@ function useGameEdit(
       : '',
   )
   const [releaseDate, setReleaseDate] = useState(game.releaseDate ?? '')
+  const [hasDenuvo, setHasDenuvo] = useState(game.hasDenuvo)
   const [error, setError] = useState('')
 
   function startEdit() {
@@ -530,6 +556,7 @@ function useGameEdit(
         : '',
     )
     setReleaseDate(game.releaseDate ?? '')
+    setHasDenuvo(game.hasDenuvo)
     setError('')
     setEditing(true)
   }
@@ -569,6 +596,7 @@ function useGameEdit(
       franchise.trim() || null,
       releaseDate || null,
       order,
+      hasDenuvo,
     )
     setEditing(false)
   }
@@ -581,6 +609,7 @@ function useGameEdit(
     franchise,
     chronologyOrder,
     releaseDate,
+    hasDenuvo,
     error,
     setName,
     setSize,
@@ -588,6 +617,7 @@ function useGameEdit(
     setFranchise,
     setChronologyOrder,
     setReleaseDate,
+    setHasDenuvo,
     startEdit,
     cancel,
     save,
@@ -686,16 +716,43 @@ function WishlistStar({
   )
 }
 
+function DenuvoToggle({
+  game,
+  onToggleDenuvo,
+}: {
+  game: Game
+  onToggleDenuvo: (id: string, hasDenuvo: boolean) => void
+}) {
+  return (
+    <button
+      type="button"
+      className={`game-denuvo ${game.hasDenuvo ? 'is-active' : ''}`}
+      onClick={() => onToggleDenuvo(game.id, !game.hasDenuvo)}
+      aria-pressed={game.hasDenuvo}
+      aria-label={
+        game.hasDenuvo
+          ? `Remover marca Denuvo de ${game.name}`
+          : `Marcar ${game.name} com Denuvo`
+      }
+      title={game.hasDenuvo ? 'Com Denuvo' : 'Sem Denuvo'}
+    >
+      D
+    </button>
+  )
+}
+
 function StatusToggles({
   game,
   drives,
   onToggleCounted,
   onToggleWishlist,
+  onToggleDenuvo,
 }: {
   game: Game
   drives: Drive[]
   onToggleCounted: (id: string, counted: boolean) => void
   onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
+  onToggleDenuvo: (id: string, hasDenuvo: boolean) => void
 }) {
   return (
     <div className="game-status-toggles">
@@ -705,6 +762,7 @@ function StatusToggles({
         drives={drives}
         onToggleWishlist={onToggleWishlist}
       />
+      <DenuvoToggle game={game} onToggleDenuvo={onToggleDenuvo} />
     </div>
   )
 }
@@ -716,6 +774,7 @@ function GameEditor({
   franchise,
   chronologyOrder,
   releaseDate,
+  hasDenuvo,
   sources,
   franchiseSuggestions,
   error,
@@ -725,6 +784,7 @@ function GameEditor({
   onFranchiseChange,
   onChronologyOrderChange,
   onReleaseDateChange,
+  onHasDenuvoChange,
   onSave,
   onCancel,
 }: {
@@ -734,6 +794,7 @@ function GameEditor({
   franchise: string
   chronologyOrder: string
   releaseDate: string
+  hasDenuvo: boolean
   sources: GameSource[]
   franchiseSuggestions: string[]
   error: string
@@ -743,6 +804,7 @@ function GameEditor({
   onFranchiseChange: (value: string) => void
   onChronologyOrderChange: (value: string) => void
   onReleaseDateChange: (value: string) => void
+  onHasDenuvoChange: (value: boolean) => void
   onSave: (event: FormEvent) => void
   onCancel: () => void
 }) {
@@ -799,6 +861,14 @@ function GameEditor({
         onChange={(e) => onReleaseDateChange(e.target.value)}
         aria-label="Data de lançamento"
       />
+      <label className="game-row__denuvo-edit">
+        <input
+          type="checkbox"
+          checked={hasDenuvo}
+          onChange={(e) => onHasDenuvoChange(e.target.checked)}
+        />
+        <span>Denuvo</span>
+      </label>
       {franchiseSuggestions.length > 0 ? (
         <datalist id="game-edit-franchise-suggestions">
           {franchiseSuggestions.map((item) => (
@@ -872,6 +942,7 @@ function GameRow({
   onSetDrive,
   onSetSource,
   onToggleWishlist,
+  onToggleDenuvo,
   onArchive,
   onRemove,
 }: ItemProps) {
@@ -890,6 +961,7 @@ function GameRow({
           franchise={edit.franchise}
           chronologyOrder={edit.chronologyOrder}
           releaseDate={edit.releaseDate}
+          hasDenuvo={edit.hasDenuvo}
           sources={sources}
           franchiseSuggestions={franchiseSuggestions}
           error={edit.error}
@@ -899,6 +971,7 @@ function GameRow({
           onFranchiseChange={edit.setFranchise}
           onChronologyOrderChange={edit.setChronologyOrder}
           onReleaseDateChange={edit.setReleaseDate}
+          onHasDenuvoChange={edit.setHasDenuvo}
           onSave={edit.save}
           onCancel={edit.cancel}
         />
@@ -916,9 +989,13 @@ function GameRow({
         drives={drives}
         onToggleCounted={onToggleCounted}
         onToggleWishlist={onToggleWishlist}
+        onToggleDenuvo={onToggleDenuvo}
       />
       <div className="game-row__main">
-        <strong>{game.name}</strong>
+        <strong>
+          {game.name}
+          <DenuvoBadge game={game} />
+        </strong>
         <span>{gameMetaLine(game, sourceName)}</span>
       </div>
       <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
@@ -943,6 +1020,7 @@ function TableRow({
   onSetDrive,
   onSetSource,
   onToggleWishlist,
+  onToggleDenuvo,
   onArchive,
   onRemove,
 }: ItemProps) {
@@ -952,7 +1030,7 @@ function TableRow({
   if (edit.editing) {
     return (
       <tr className="game-table__edit-row" style={{ animationDelay: delay }}>
-        <td colSpan={10}>
+        <td colSpan={11}>
           <GameEditor
             name={edit.name}
             size={edit.size}
@@ -960,6 +1038,7 @@ function TableRow({
             franchise={edit.franchise}
             chronologyOrder={edit.chronologyOrder}
             releaseDate={edit.releaseDate}
+            hasDenuvo={edit.hasDenuvo}
             sources={sources}
             franchiseSuggestions={franchiseSuggestions}
             error={edit.error}
@@ -969,6 +1048,7 @@ function TableRow({
             onFranchiseChange={edit.setFranchise}
             onChronologyOrderChange={edit.setChronologyOrder}
             onReleaseDateChange={edit.setReleaseDate}
+            onHasDenuvoChange={edit.setHasDenuvo}
             onSave={edit.save}
             onCancel={edit.cancel}
           />
@@ -985,15 +1065,20 @@ function TableRow({
           drives={drives}
           onToggleCounted={onToggleCounted}
           onToggleWishlist={onToggleWishlist}
+          onToggleDenuvo={onToggleDenuvo}
         />
       </td>
-      <td className="game-table__name">{game.name}</td>
+      <td className="game-table__name">
+        {game.name}
+        <DenuvoBadge game={game} />
+      </td>
       <td className="game-table__size">{formatSize(game.sizeGb)}</td>
       <td>{game.franchise ?? '—'}</td>
       <td>
         {typeof game.chronologyOrder === 'number' ? game.chronologyOrder : '—'}
       </td>
       <td>{game.releaseDate ? formatReleaseDate(game.releaseDate) : '—'}</td>
+      <td>{game.hasDenuvo ? 'Sim' : 'Não'}</td>
       <td>
         <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
       </td>
@@ -1023,6 +1108,7 @@ function GameCard({
   onSetDrive,
   onSetSource,
   onToggleWishlist,
+  onToggleDenuvo,
   onArchive,
   onRemove,
 }: ItemProps) {
@@ -1041,6 +1127,7 @@ function GameCard({
           franchise={edit.franchise}
           chronologyOrder={edit.chronologyOrder}
           releaseDate={edit.releaseDate}
+          hasDenuvo={edit.hasDenuvo}
           sources={sources}
           franchiseSuggestions={franchiseSuggestions}
           error={edit.error}
@@ -1050,6 +1137,7 @@ function GameCard({
           onFranchiseChange={edit.setFranchise}
           onChronologyOrderChange={edit.setChronologyOrder}
           onReleaseDateChange={edit.setReleaseDate}
+          onHasDenuvoChange={edit.setHasDenuvo}
           onSave={edit.save}
           onCancel={edit.cancel}
         />
@@ -1061,6 +1149,7 @@ function GameCard({
               drives={drives}
               onToggleCounted={onToggleCounted}
               onToggleWishlist={onToggleWishlist}
+              onToggleDenuvo={onToggleDenuvo}
             />
             <ItemActions
               onEdit={edit.startEdit}
@@ -1068,7 +1157,10 @@ function GameCard({
               onRemove={() => onRemove(game.id)}
             />
           </div>
-          <strong>{game.name}</strong>
+          <strong>
+            {game.name}
+            <DenuvoBadge game={game} />
+          </strong>
           <span className="game-card__size">{gameMetaLine(game, sourceName)}</span>
           <SourceSelect game={game} sources={sources} onSetSource={onSetSource} />
           <DriveSelect game={game} drives={drives} onSetDrive={onSetDrive} />

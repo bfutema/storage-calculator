@@ -125,6 +125,7 @@ function normalizeGame(
         ? game.wishlist && !(typeof game.counted === 'boolean' ? game.counted : true)
         : false,
     archived: typeof game.archived === 'boolean' ? game.archived : false,
+    hasDenuvo: typeof game.hasDenuvo === 'boolean' ? game.hasDenuvo : false,
     driveId:
       typeof game.driveId === 'string' && game.driveId
         ? game.driveId
@@ -504,6 +505,7 @@ export function useLibrary() {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) {
     setState((prev) => {
       const fallback =
@@ -527,6 +529,7 @@ export function useLibrary() {
         counted: true,
         wishlist: false,
         archived: false,
+        hasDenuvo: Boolean(hasDenuvo),
         driveId: resolvedDriveId,
         sourceId: resolvedSourceId,
         franchise: normalizeFranchise(franchise),
@@ -547,6 +550,7 @@ export function useLibrary() {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) {
     setState((prev) => ({
       ...prev,
@@ -573,8 +577,19 @@ export function useLibrary() {
             releaseDate === undefined
               ? game.releaseDate
               : normalizeReleaseDate(releaseDate),
+          hasDenuvo:
+            hasDenuvo === undefined ? game.hasDenuvo : Boolean(hasDenuvo),
         }
       }),
+    }))
+  }
+
+  function setGameDenuvo(id: string, hasDenuvo: boolean) {
+    setState((prev) => ({
+      ...prev,
+      games: prev.games.map((game) =>
+        game.id === id ? { ...game, hasDenuvo } : game,
+      ),
     }))
   }
 
@@ -792,6 +807,7 @@ export function useLibrary() {
     removeSource,
     addGame,
     updateGame,
+    setGameDenuvo,
     setGameSource,
     setGamesSource,
     setGameDrive,

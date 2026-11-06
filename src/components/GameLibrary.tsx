@@ -35,6 +35,7 @@ interface GameLibraryProps {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) => void
   onUpdate: (
     id: string,
@@ -44,6 +45,7 @@ interface GameLibraryProps {
     franchise?: string | null,
     releaseDate?: string | null,
     chronologyOrder?: number | null,
+    hasDenuvo?: boolean,
   ) => void
   onToggleCounted: (id: string, counted: boolean) => void
   onSetCounted: (ids: string[], counted: boolean) => void
@@ -53,6 +55,7 @@ interface GameLibraryProps {
   onSetGamesSource: (ids: string[], sourceId: string) => void
   onToggleWishlist: (id: string, wishlist: boolean, driveId?: string) => void
   onSetWishlist: (ids: string[], wishlist: boolean, driveId?: string) => void
+  onToggleDenuvo: (id: string, hasDenuvo: boolean) => void
   onAddSource: (name: string) => string | null
   onRemoveSource: (id: string) => void
   onArchive: (id: string) => void
@@ -186,6 +189,7 @@ export function GameLibrary({
   onSetGamesSource,
   onToggleWishlist,
   onSetWishlist,
+  onToggleDenuvo,
   onAddSource,
   onRemoveSource,
   onArchive,
@@ -331,6 +335,7 @@ export function GameLibrary({
       values.franchise,
       values.releaseDate,
       values.chronologyOrder,
+      values.hasDenuvo,
     )
     setQuery('')
     setStatusFilter('all')
@@ -782,6 +787,7 @@ export function GameLibrary({
       onSetDrive={onSetDrive}
       onSetSource={onSetSource}
       onToggleWishlist={onToggleWishlist}
+      onToggleDenuvo={onToggleDenuvo}
       onArchive={onArchive}
       onRemove={onRemove}
     />

@@ -46,6 +46,7 @@ function App() {
     removeSource,
     addGame,
     updateGame,
+    setGameDenuvo,
     setGameSource,
     setGamesSource,
     setGameDrive,
@@ -107,6 +108,7 @@ function App() {
       onSetGamesSource={setGamesSource}
       onToggleWishlist={setGameWishlist}
       onSetWishlist={setGamesWishlist}
+      onToggleDenuvo={setGameDenuvo}
       onAddSource={addSource}
       onRemoveSource={removeSource}
       onArchive={(id) => setGameArchived(id, true)}
@@ -355,6 +357,7 @@ function App() {
                 values.franchise,
                 values.releaseDate,
                 values.chronologyOrder,
+                values.hasDenuvo,
               )
             }
             onAddSource={addSource}

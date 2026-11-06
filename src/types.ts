@@ -31,6 +31,8 @@ export interface Game {
   /** Planned install — counts toward the assigned drive, shown in purple. */
   wishlist: boolean
   archived: boolean
+  /** Denuvo anti-tamper DRM present on this title. */
+  hasDenuvo: boolean
   driveId: string
   sourceId: string
   /** Series / franchise for chronological play order (e.g. Assassin's Creed). */

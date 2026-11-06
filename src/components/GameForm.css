@@ -70,6 +70,35 @@
   color: var(--muted);
 }
 
+.field--check {
+  align-content: start;
+}
+
+.check-row {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55rem;
+  min-height: 2.9rem;
+  padding: 0 0.15rem;
+  cursor: pointer;
+  color: var(--ink-soft);
+  font-size: 0.95rem;
+}
+
+.check-row input {
+  width: 1.05rem;
+  height: 1.05rem;
+  accent-color: var(--denuvo);
+  cursor: pointer;
+}
+
+.check-row span {
+  font-size: 0.95rem;
+  letter-spacing: 0;
+  text-transform: none;
+  color: inherit;
+}
+
 .field input,
 .field select,
 .size-row input,

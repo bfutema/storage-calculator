@@ -167,15 +167,22 @@
   min-width: 0;
 }
 
+.game-row__main strong,
+.game-card strong,
+.game-table__name {
+  display: inline-flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.15rem 0;
+}
+
 .game-row__main strong {
   font-family: var(--font-display);
   font-size: 1.05rem;
   font-weight: 650;
   letter-spacing: -0.02em;
   color: var(--ink);
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  min-width: 0;
 }
 
 .game-row__main span {
@@ -305,7 +312,7 @@
 }
 
 .game-table__check {
-  width: 5.5rem;
+  width: 7.25rem;
 }
 
 .game-status-toggles {
@@ -315,7 +322,8 @@
   flex-shrink: 0;
 }
 
-.game-wish {
+.game-wish,
+.game-denuvo {
   appearance: none;
   border: none;
   background: transparent;
@@ -339,8 +347,59 @@
   color: var(--wishlist);
 }
 
-.game-wish:active {
+.game-wish:active,
+.game-denuvo:active {
   transform: scale(0.94);
+}
+
+.game-denuvo {
+  font-size: 0.72rem;
+  font-weight: 800;
+  letter-spacing: 0.02em;
+}
+
+.game-denuvo:hover {
+  color: var(--denuvo);
+  background: color-mix(in srgb, var(--denuvo) 14%, transparent);
+}
+
+.game-denuvo.is-active {
+  color: var(--denuvo-ink);
+  background: color-mix(in srgb, var(--denuvo) 22%, transparent);
+}
+
+.denuvo-badge {
+  display: inline-flex;
+  align-items: center;
+  margin-left: 0.45rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  font-family: var(--font-body);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  vertical-align: middle;
+  color: var(--denuvo-ink);
+  background: color-mix(in srgb, var(--denuvo) 22%, transparent);
+}
+
+.game-row__denuvo-edit {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.35rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.4);
+  color: var(--ink-soft);
+  font-size: 0.9rem;
+  cursor: pointer;
+}
+
+.game-row__denuvo-edit input {
+  accent-color: var(--denuvo);
+  cursor: pointer;
 }
 
 .game-table__name {

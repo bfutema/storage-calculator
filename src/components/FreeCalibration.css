@@ -3,8 +3,8 @@
   gap: 0.65rem;
   padding: 0.85rem 0.9rem;
   border-radius: 14px;
-  background: rgba(196, 135, 58, 0.1);
-  border: 1px solid rgba(196, 135, 58, 0.22);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
 }
 
 .free-cal--compact {
@@ -70,7 +70,7 @@
 .free-cal .field input {
   width: 100%;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-field);
   color: var(--ink);
   border-radius: 10px;
   padding: 0.55rem 0.7rem;

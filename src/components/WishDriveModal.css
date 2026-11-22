@@ -5,7 +5,7 @@
   display: grid;
   place-items: center;
   padding: 1rem;
-  background: rgba(18, 40, 32, 0.55);
+  background: var(--overlay-strong);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
 }
@@ -16,10 +16,10 @@
   gap: 1rem;
   padding: 1.25rem 1.35rem 1.4rem;
   border-radius: 24px;
-  background: #f4f8f4;
-  border: 1px solid rgba(255, 255, 255, 0.85);
-  box-shadow: 0 24px 60px rgba(18, 40, 32, 0.28);
-  color: #12281f;
+  background: var(--sheet);
+  border: 1px solid var(--sheet-border);
+  box-shadow: 0 24px 60px var(--shadow-lg);
+  color: var(--ink);
 }
 
 .wish-modal__head {
@@ -35,7 +35,7 @@
   font-size: 1.2rem;
   font-weight: 700;
   letter-spacing: -0.02em;
-  color: #12281f;
+  color: var(--ink);
 }
 
 .wish-modal__form {
@@ -45,7 +45,7 @@
 
 .wish-modal__hint {
   margin: 0;
-  color: #5d756a;
+  color: var(--muted);
   line-height: 1.45;
 }
 
@@ -57,18 +57,11 @@
 .wish-modal__field span {
   font-size: 0.85rem;
   font-weight: 650;
-  color: #12281f;
+  color: var(--ink);
 }
 
-.wish-modal__field select {
-  width: 100%;
-  appearance: none;
-  border: 1px solid rgba(22, 53, 42, 0.18);
-  border-radius: 12px;
+.wish-modal__field .fancy-select__trigger {
   padding: 0.7rem 0.85rem;
-  background: #ffffff;
-  color: #12281f;
-  font: inherit;
 }
 
 .wish-modal__actions {
@@ -91,22 +84,22 @@
 
 .wish-modal__ghost {
   background: transparent;
-  color: #1e3d31;
+  color: var(--ink-soft);
   padding: 0.55rem 0.85rem;
 }
 
 .wish-modal__ghost:hover {
-  background: rgba(22, 53, 42, 0.08);
+  background: var(--fill-hover);
 }
 
 .wish-modal__confirm {
-  background: #12281f;
-  color: #eef4ee;
+  background: var(--ink);
+  color: var(--paper);
   padding: 0.7rem 1.2rem;
 }
 
 .wish-modal__confirm:hover:not(:disabled) {
-  background: #16352a;
+  background: var(--ink-hover);
 }
 
 .wish-modal__confirm:disabled {

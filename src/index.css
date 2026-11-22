@@ -1,12 +1,17 @@
 :root {
+  color-scheme: light;
   --font-display: 'Syne', sans-serif;
   --font-body: 'Source Sans 3', system-ui, sans-serif;
 
   --paper: #eef4ee;
+  --paper-deep: #dce8df;
+  --paper-mid: #e7efe6;
   --ink: #12281f;
   --ink-soft: #1e3d31;
+  --ink-hover: #16352a;
   --muted: #5d756a;
   --line: rgba(22, 53, 42, 0.16);
+  --line-strong: rgba(22, 53, 42, 0.28);
   --accent: #8cd650;
   --accent-ink: #2f6b2a;
   --wishlist: #8b6cc7;
@@ -15,9 +20,56 @@
   --denuvo-ink: #6b3d12;
   --danger: #c44030;
 
+  --surface: rgba(255, 255, 255, 0.55);
+  --surface-soft: rgba(255, 255, 255, 0.4);
+  --surface-faint: rgba(255, 255, 255, 0.28);
+  --surface-raised: rgba(255, 255, 255, 0.72);
+  --surface-strong: rgba(255, 255, 255, 0.9);
+  --surface-solid: #ffffff;
+  --surface-field: rgba(255, 255, 255, 0.7);
+  --sheet: #f4f8f4;
+  --sheet-start: rgba(255, 255, 255, 0.96);
+  --sheet-end: rgba(238, 244, 238, 0.94);
+  --sheet-border: rgba(255, 255, 255, 0.7);
+  --panel-start: rgba(255, 255, 255, 0.72);
+  --panel-end: rgba(255, 255, 255, 0.48);
+  --panel-border: rgba(255, 255, 255, 0.55);
+  --panel-inset: rgba(255, 255, 255, 0.7);
+  --modal-start: rgba(255, 255, 255, 0.94);
+  --modal-end: rgba(238, 244, 238, 0.92);
+  --overlay: rgba(18, 40, 32, 0.42);
+  --overlay-strong: rgba(18, 40, 32, 0.55);
+  --shadow: rgba(18, 40, 32, 0.18);
+  --shadow-lg: rgba(18, 40, 32, 0.28);
+  --shadow-soft: rgba(22, 53, 42, 0.08);
+  --fill: rgba(22, 53, 42, 0.05);
+  --fill-hover: rgba(22, 53, 42, 0.06);
+  --fill-strong: rgba(22, 53, 42, 0.1);
+  --badge-muted: rgba(22, 53, 42, 0.12);
+  --divider: rgba(22, 53, 42, 0.08);
+  --grid: rgba(22, 53, 42, 0.04);
+  --track: rgba(24, 48, 40, 0.1);
+  --check-inset: rgba(255, 255, 255, 0.15);
+  --hint: rgba(140, 214, 80, 0.16);
+  --hint-warn: rgba(196, 64, 48, 0.12);
+  --focus-ring: rgba(140, 214, 80, 0.25);
+  --danger-soft: rgba(196, 64, 48, 0.1);
+  --warn-soft: rgba(196, 135, 58, 0.1);
+  --warn-line: rgba(196, 135, 58, 0.22);
+  --glow-a: rgba(168, 224, 96, 0.35);
+  --glow-b: rgba(61, 155, 122, 0.28);
+  --glow-c: rgba(240, 216, 140, 0.22);
+  --gauge-shadow: rgba(18, 56, 42, 0.18);
+  --pulse: rgba(140, 214, 80, 0.08);
+  --selection: rgba(140, 214, 80, 0.35);
+
   color: var(--ink);
-  background:
-    linear-gradient(180deg, #dce8df 0%, var(--paper) 38%, #e7efe6 100%);
+  background: linear-gradient(
+    180deg,
+    var(--paper-deep) 0%,
+    var(--paper) 38%,
+    var(--paper-mid) 100%
+  );
   font-family: var(--font-body);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
@@ -25,6 +77,70 @@
   -moz-osx-font-smoothing: grayscale;
   font-size: 16px;
   line-height: 1.45;
+}
+
+:root[data-theme='dark'] {
+  color-scheme: dark;
+
+  --paper: #0f1714;
+  --paper-deep: #0a100e;
+  --paper-mid: #141e19;
+  --ink: #e7f3eb;
+  --ink-soft: #c5d9ce;
+  --ink-hover: #f4fff8;
+  --muted: #93aa9f;
+  --line: rgba(214, 232, 220, 0.16);
+  --line-strong: rgba(214, 232, 220, 0.32);
+  --accent: #9be25c;
+  --accent-ink: #c6f08a;
+  --wishlist: #cbb6f2;
+  --wishlist-ink: #e0d2fa;
+  --denuvo: #e8a45c;
+  --denuvo-ink: #f6c992;
+  --danger: #ff8d7e;
+
+  --surface: rgba(255, 255, 255, 0.06);
+  --surface-soft: rgba(255, 255, 255, 0.045);
+  --surface-faint: rgba(255, 255, 255, 0.03);
+  --surface-raised: rgba(255, 255, 255, 0.1);
+  --surface-strong: rgba(255, 255, 255, 0.14);
+  --surface-solid: #1c2b24;
+  --surface-field: rgba(255, 255, 255, 0.08);
+  --sheet: #18241e;
+  --sheet-start: rgba(28, 42, 35, 0.98);
+  --sheet-end: rgba(16, 26, 21, 0.96);
+  --sheet-border: rgba(214, 232, 220, 0.12);
+  --panel-start: rgba(36, 54, 45, 0.92);
+  --panel-end: rgba(16, 26, 22, 0.86);
+  --panel-border: rgba(214, 232, 220, 0.12);
+  --panel-inset: rgba(255, 255, 255, 0.05);
+  --modal-start: rgba(30, 46, 38, 0.98);
+  --modal-end: rgba(18, 28, 23, 0.96);
+  --overlay: rgba(4, 8, 6, 0.66);
+  --overlay-strong: rgba(4, 8, 6, 0.76);
+  --shadow: rgba(0, 0, 0, 0.45);
+  --shadow-lg: rgba(0, 0, 0, 0.58);
+  --shadow-soft: rgba(0, 0, 0, 0.32);
+  --fill: rgba(214, 232, 220, 0.06);
+  --fill-hover: rgba(214, 232, 220, 0.08);
+  --fill-strong: rgba(214, 232, 220, 0.12);
+  --badge-muted: rgba(0, 0, 0, 0.32);
+  --divider: rgba(214, 232, 220, 0.1);
+  --grid: rgba(214, 232, 220, 0.045);
+  --track: rgba(214, 232, 220, 0.14);
+  --check-inset: rgba(0, 0, 0, 0.18);
+  --hint: rgba(155, 226, 92, 0.16);
+  --hint-warn: rgba(255, 141, 126, 0.16);
+  --focus-ring: rgba(155, 226, 92, 0.32);
+  --danger-soft: rgba(255, 141, 126, 0.14);
+  --warn-soft: rgba(232, 164, 92, 0.14);
+  --warn-line: rgba(232, 164, 92, 0.32);
+  --glow-a: rgba(155, 226, 92, 0.14);
+  --glow-b: rgba(61, 155, 122, 0.2);
+  --glow-c: rgba(232, 180, 90, 0.08);
+  --gauge-shadow: rgba(0, 0, 0, 0.45);
+  --pulse: rgba(155, 226, 92, 0.12);
+  --selection: rgba(155, 226, 92, 0.35);
 }
 
 *,
@@ -37,20 +153,37 @@ html,
 body,
 #root {
   min-height: 100%;
+}
+
+html:has(.app--focus),
+body:has(.app--focus),
+#root:has(.app--focus),
+html:has(.app--mobile),
+body:has(.app--mobile),
+#root:has(.app--mobile) {
   height: 100%;
+  overflow: hidden;
 }
 
 body {
   margin: 0;
   min-width: 320px;
+  color: var(--ink);
+  background: transparent;
 }
 
 button,
 input,
 select {
   font: inherit;
+  color: inherit;
+}
+
+select option {
+  background: var(--sheet);
+  color: var(--ink);
 }
 
 ::selection {
-  background: rgba(140, 214, 80, 0.35);
+  background: var(--selection);
 }

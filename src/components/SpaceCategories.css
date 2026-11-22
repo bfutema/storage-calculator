@@ -40,8 +40,8 @@
   gap: 0.5rem;
   padding: 0.55rem 0.65rem;
   border-radius: 12px;
-  background: rgba(22, 53, 42, 0.05);
-  border: 1px solid rgba(22, 53, 42, 0.08);
+  background: var(--fill);
+  border: 1px solid var(--divider);
 }
 
 .space-cats__copy {
@@ -79,7 +79,7 @@
 .space-cats__add input {
   width: 100%;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-field);
   border-radius: 10px;
   padding: 0.55rem 0.7rem;
   font: inherit;
@@ -103,7 +103,7 @@
   display: grid;
   gap: 0.55rem;
   padding-top: 0.35rem;
-  border-top: 1px solid rgba(22, 53, 42, 0.1);
+  border-top: 1px solid var(--divider);
 }
 
 .space-cats--compact .space-cats__head h3 {

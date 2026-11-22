@@ -2,8 +2,29 @@
 <html lang="pt-BR">
   <head>
     <meta charset="UTF-8" />
+    <meta name="theme-color" content="#eef4ee" />
+    <script>
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('storage-calculator:theme')
+          var theme =
+            stored === 'light' || stored === 'dark'
+              ? stored
+              : window.matchMedia('(prefers-color-scheme: dark)').matches
+                ? 'dark'
+                : 'light'
+          document.documentElement.dataset.theme = theme
+          document.documentElement.style.colorScheme = theme
+          var meta = document.querySelector('meta[name="theme-color"]')
+          if (meta) meta.content = theme === 'dark' ? '#0f1714' : '#eef4ee'
+        } catch (e) {}
+      })()
+    </script>
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, viewport-fit=cover, interactive-widget=resizes-content"
+    />
     <meta
       name="description"
       content="Calcule quanto espaço em SSD você precisa para instalar sua biblioteca de jogos."

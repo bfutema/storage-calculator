@@ -1,4 +1,10 @@
-import { useEffect, type MouseEvent } from 'react'
+import {
+  useEffect,
+  useState,
+  type AnimationEvent,
+  type MouseEvent,
+} from 'react'
+import { createPortal } from 'react-dom'
 import type { GameSource } from '../types'
 import { GameForm, type GameFormValues } from './GameForm'
 import './AddGameModal.css'
@@ -22,39 +28,74 @@ export function AddGameModal({
   onAdd,
   onAddSource,
 }: AddGameModalProps) {
+  const [mounted, setMounted] = useState(open)
+  const [closing, setClosing] = useState(false)
+
   useEffect(() => {
-    if (!open) return
+    if (open) {
+      setMounted(true)
+      setClosing(false)
+      return
+    }
+
+    if (mounted) setClosing(true)
+  }, [open, mounted])
+
+  useEffect(() => {
+    if (!mounted || closing) return
+
+    const previousOverflow = document.body.style.overflow
+    document.body.style.overflow = 'hidden'
 
     function handleKey(event: KeyboardEvent) {
-      if (event.key === 'Escape') onClose()
+      if (event.key === 'Escape') setClosing(true)
     }
 
     document.addEventListener('keydown', handleKey)
-    return () => document.removeEventListener('keydown', handleKey)
-  }, [open, onClose])
+    return () => {
+      document.body.style.overflow = previousOverflow
+      document.removeEventListener('keydown', handleKey)
+    }
+  }, [mounted, closing])
 
-  if (!open) return null
+  function handleAnimationEnd(event: AnimationEvent<HTMLDivElement>) {
+    if (event.target !== event.currentTarget || !closing) return
+    setMounted(false)
+    setClosing(false)
+    if (open) onClose()
+  }
 
   function handleBackdrop(event: MouseEvent<HTMLDivElement>) {
-    if (event.target === event.currentTarget) onClose()
+    if (event.target === event.currentTarget) setClosing(true)
   }
 
   function handleAdd(values: GameFormValues) {
     onAdd(values)
-    onClose()
+    setClosing(true)
   }
 
-  return (
-    <div className="modal" onMouseDown={handleBackdrop}>
+  if (!mounted) return null
+
+  return createPortal(
+    <div
+      className={`modal ${closing ? 'is-closing' : 'is-open'}`}
+      onMouseDown={handleBackdrop}
+    >
       <div
-        className="modal__dialog"
+        className={`modal__dialog ${closing ? 'is-closing' : 'is-open'}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="add-game-title"
+        onAnimationEnd={handleAnimationEnd}
       >
+        <div className="modal__handle" aria-hidden="true" />
         <div className="modal__head">
           <h2 id="add-game-title">Adicionar jogo</h2>
-          <button type="button" className="btn btn--ghost" onClick={onClose}>
+          <button
+            type="button"
+            className="btn btn--ghost"
+            onClick={() => setClosing(true)}
+          >
             Fechar
           </button>
         </div>
@@ -68,6 +109,7 @@ export function AddGameModal({
           onAddSource={onAddSource}
         />
       </div>
-    </div>
+    </div>,
+    document.body,
   )
 }

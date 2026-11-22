@@ -32,13 +32,13 @@
   gap: 0.55rem;
   padding: 0.85rem 0.95rem;
   border-radius: 16px;
-  border: 1.5px solid rgba(22, 53, 42, 0.1);
-  background: rgba(255, 255, 255, 0.4);
+  border: 1.5px solid var(--fill-strong);
+  background: var(--surface-soft);
 }
 
 .drive-card.is-selected {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 16%, rgba(255, 255, 255, 0.72));
+  background: color-mix(in srgb, var(--accent) 16%, var(--paper));
 }
 
 .drive-card.is-over {
@@ -86,12 +86,12 @@
 }
 
 .drive-badge--ext {
-  background: rgba(22, 53, 42, 0.12);
+  background: var(--badge-muted);
   color: var(--ink-soft);
 }
 
 .drive-badge--type {
-  background: color-mix(in srgb, var(--accent) 26%, rgba(255, 255, 255, 0.7));
+  background: color-mix(in srgb, var(--accent) 26%, var(--paper));
   color: var(--accent-ink);
 }
 
@@ -104,7 +104,7 @@
   display: block;
   height: 0.35rem;
   border-radius: 999px;
-  background: rgba(22, 53, 42, 0.1);
+  background: var(--fill-strong);
   overflow: hidden;
 }
 
@@ -134,7 +134,7 @@
   display: grid;
   gap: 0.75rem;
   padding-top: 0.35rem;
-  border-top: 1px solid rgba(22, 53, 42, 0.1);
+  border-top: 1px solid var(--divider);
 }
 
 .drives__add-fields {
@@ -162,8 +162,8 @@
   padding: 0.85rem;
   border-radius: 16px;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.94);
-  box-shadow: 0 12px 28px rgba(18, 40, 32, 0.16);
+  background: var(--surface-solid);
+  box-shadow: 0 12px 28px var(--shadow);
   max-width: min(28rem, calc(100vw - 2rem));
   width: 22rem;
 }
@@ -187,7 +187,7 @@
 .drive-switcher__btn {
   appearance: none;
   border: 1.5px solid var(--line);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   border-radius: 10px;
   cursor: pointer;
   display: grid;
@@ -230,7 +230,7 @@
   justify-items: start;
   text-align: left;
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 22%, rgba(255, 255, 255, 0.78));
+  background: color-mix(in srgb, var(--accent) 22%, var(--paper));
 }
 
 .drive-switcher__btn strong {
@@ -271,7 +271,7 @@
   appearance: none;
   box-sizing: border-box;
   border: 1.5px dashed color-mix(in srgb, var(--ink) 28%, transparent);
-  background: rgba(255, 255, 255, 0.28);
+  background: var(--surface-faint);
   border-radius: 10px;
   width: var(--drive-tile);
   height: var(--drive-tile);
@@ -297,7 +297,7 @@
 .drive-switcher__add.is-active {
   border-color: var(--ink);
   border-style: dashed;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   color: var(--ink);
 }
 

@@ -3,6 +3,7 @@ import { useMediaQuery } from '../hooks/useMediaQuery'
 import type { Drive, Game, GameSource } from '../types'
 import { formatSize } from '../utils/format'
 import { ArchiveIcon, ToolsIcon, TrashIcon } from './ActionIcons'
+import { FancySelect } from './FancySelect'
 import { GameForm, type GameFormValues } from './GameForm'
 import { GameList, type SortDirection, type SortField, type ViewMode } from './GameList'
 import { ViewModePicker } from './ViewModePicker'
@@ -616,17 +617,15 @@ export function GameLibrary({
         <div className="library__move">
           <label>
             <span>Mover visíveis para SSD</span>
-            <select
+            <FancySelect
+              label="SSD"
               value={moveTarget || drives[0].id}
-              onChange={(e) => setMoveTarget(e.target.value)}
-            >
-              {drives.map((drive) => (
-                <option key={drive.id} value={drive.id}>
-                  {drive.name}
-                  {drive.isInternal ? ' · interno' : ''}
-                </option>
-              ))}
-            </select>
+              onChange={setMoveTarget}
+              options={drives.map((drive) => ({
+                value: drive.id,
+                label: `${drive.name}${drive.isInternal ? ' · interno' : ''}`,
+              }))}
+            />
           </label>
           <button
             type="button"
@@ -645,16 +644,15 @@ export function GameLibrary({
       <div className="library__move">
         <label>
           <span>Definir origem dos visíveis</span>
-          <select
+          <FancySelect
+            label="Origem"
             value={sourceTarget || sources[0]?.id || ''}
-            onChange={(e) => setSourceTarget(e.target.value)}
-          >
-            {sources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-          </select>
+            onChange={setSourceTarget}
+            options={sources.map((source) => ({
+              value: source.id,
+              label: source.name,
+            }))}
+          />
         </label>
         <button
           type="button"
@@ -1068,7 +1066,7 @@ export function GameLibrary({
       ) : (
         <div className="library__empty">
           <p>
-            {fillViewport
+            {hideForm
               ? 'Nenhum jogo ativo. Use o botão + para adicionar ou restaure um arquivado.'
               : 'Nenhum jogo ativo. Use o formulário ou restaure um título arquivado.'}
           </p>

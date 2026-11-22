@@ -1,0 +1,289 @@
+.fancy-date {
+  position: relative;
+  min-width: 0;
+  width: 100%;
+}
+
+.fancy-date__trigger {
+  appearance: none;
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.55rem;
+  border: 1px solid var(--line);
+  background: var(--surface);
+  color: var(--ink);
+  border-radius: 12px;
+  padding: 0.8rem 0.9rem;
+  font: inherit;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  text-align: left;
+  transition:
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    background 0.2s ease;
+}
+
+.fancy-date.is-open .fancy-date__trigger,
+.fancy-date__trigger:hover {
+  border-color: var(--accent);
+  background: var(--surface-strong);
+}
+
+.fancy-date.is-open .fancy-date__trigger {
+  box-shadow: 0 0 0 3px var(--focus-ring);
+}
+
+.fancy-date__trigger .is-placeholder {
+  color: var(--muted);
+  font-weight: 500;
+}
+
+.fancy-date__icon {
+  display: grid;
+  place-items: center;
+  color: var(--muted);
+}
+
+.fancy-date__layer {
+  position: fixed;
+  inset: 0;
+  z-index: 80;
+}
+
+.fancy-date__layer--float {
+  pointer-events: none;
+  background: transparent;
+}
+
+.fancy-date__layer--sheet {
+  display: flex;
+  align-items: flex-end;
+  pointer-events: auto;
+  background: var(--overlay-strong);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  animation: fancy-date-backdrop-in 0.24s ease both;
+}
+
+.fancy-date__layer--sheet.is-closing {
+  animation: fancy-date-backdrop-out 0.2s ease both;
+}
+
+.fancy-date__panel {
+  display: grid;
+  gap: 0.7rem;
+  padding: 0.85rem;
+  border-radius: 18px;
+  border: 1px solid var(--sheet-border);
+  background: var(--surface-solid);
+  box-shadow: 0 16px 36px var(--shadow);
+  transform-origin: top center;
+  animation: fancy-date-in 0.2s cubic-bezier(0.22, 1, 0.36, 1) both;
+}
+
+.fancy-date__panel--float {
+  position: fixed;
+  z-index: 81;
+  pointer-events: auto;
+  max-width: calc(100vw - 1rem);
+}
+
+.fancy-date__panel.is-closing {
+  animation: fancy-date-out 0.16s ease both;
+}
+
+.fancy-date__toolbar {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.fancy-date__toolbar strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-align: center;
+}
+
+.fancy-date__nav {
+  appearance: none;
+  width: 2.1rem;
+  height: 2.1rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.15rem;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.fancy-date__nav:hover {
+  background: var(--fill-hover);
+}
+
+.fancy-date__weekdays,
+.fancy-date__grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 0.25rem;
+}
+
+.fancy-date__weekdays span {
+  text-align: center;
+  font-size: 0.72rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  color: var(--muted);
+  padding: 0.2rem 0;
+}
+
+.fancy-date__day {
+  appearance: none;
+  aspect-ratio: 1;
+  border: none;
+  border-radius: 12px;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 650;
+  cursor: pointer;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.fancy-date__day:hover {
+  background: var(--fill-hover);
+}
+
+.fancy-date__day.is-muted {
+  color: color-mix(in srgb, var(--muted) 70%, transparent);
+}
+
+.fancy-date__day.is-today {
+  box-shadow: inset 0 0 0 1.5px color-mix(in srgb, var(--accent) 55%, transparent);
+}
+
+.fancy-date__day.is-selected {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: none;
+}
+
+.fancy-date__footer {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
+  justify-content: flex-end;
+}
+
+.fancy-date__ghost {
+  appearance: none;
+  border: none;
+  background: var(--fill);
+  color: var(--ink-soft);
+  border-radius: 999px;
+  padding: 0.45rem 0.8rem;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.fancy-date__panel--sheet {
+  position: relative;
+  width: 100%;
+  border-radius: 24px 24px 0 0;
+  border-bottom: none;
+  padding: 0.55rem 1rem max(1rem, env(safe-area-inset-bottom));
+  box-shadow: 0 -18px 48px var(--shadow);
+  transform-origin: bottom center;
+  animation: fancy-date-sheet-in 0.34s cubic-bezier(0.22, 1, 0.36, 1) both;
+  pointer-events: auto;
+}
+
+.fancy-date__panel--sheet.is-closing {
+  animation: fancy-date-sheet-out 0.22s cubic-bezier(0.4, 0, 1, 1) both;
+}
+
+.fancy-date__sheet-handle {
+  width: 2.5rem;
+  height: 0.28rem;
+  margin: 0.1rem auto 0.35rem;
+  border-radius: 999px;
+  background: var(--fill-strong);
+}
+
+.fancy-date__panel--sheet .fancy-date__day {
+  min-height: 2.55rem;
+  aspect-ratio: auto;
+}
+
+@keyframes fancy-date-in {
+  from {
+    opacity: 0;
+    transform: translateY(-0.4rem) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes fancy-date-out {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+  to {
+    opacity: 0;
+    transform: translateY(-0.3rem) scale(0.98);
+  }
+}
+
+@keyframes fancy-date-backdrop-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes fancy-date-backdrop-out {
+  from {
+    opacity: 1;
+  }
+  to {
+    opacity: 0;
+  }
+}
+
+@keyframes fancy-date-sheet-in {
+  from {
+    opacity: 0.85;
+    transform: translateY(110%);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes fancy-date-sheet-out {
+  from {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  to {
+    opacity: 0.9;
+    transform: translateY(110%);
+  }
+}

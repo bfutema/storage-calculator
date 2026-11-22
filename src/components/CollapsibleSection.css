@@ -1,7 +1,7 @@
 .collapse {
-  border: 1px solid rgba(22, 53, 42, 0.12);
+  border: 1px solid var(--line);
   border-radius: 14px;
-  background: rgba(255, 255, 255, 0.42);
+  background: var(--surface-soft);
   overflow: clip;
 }
 
@@ -27,7 +27,7 @@
 }
 
 .collapse__trigger:hover {
-  background: rgba(22, 53, 42, 0.04);
+  background: var(--fill);
 }
 
 .collapse__copy {
@@ -59,7 +59,7 @@
   width: 1.35rem;
   height: 1.35rem;
   border-radius: 8px;
-  background: rgba(22, 53, 42, 0.08);
+  background: var(--fill-strong);
   position: relative;
 }
 
@@ -87,7 +87,7 @@
 }
 
 .collapse[open] .collapse__trigger {
-  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+  border-bottom: 1px solid var(--divider);
 }
 
 .collapse[open] .collapse__summary {

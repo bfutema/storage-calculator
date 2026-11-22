@@ -1,6 +1,7 @@
 import { useEffect, useState, type FormEvent, type MouseEvent } from 'react'
 import { createPortal } from 'react-dom'
 import type { Drive } from '../types'
+import { FancySelect } from './FancySelect'
 import './WishDriveModal.css'
 
 interface WishDriveModalProps {
@@ -86,17 +87,17 @@ function WishDriveDialog({
           <p className="wish-modal__hint">{description}</p>
           <label className="wish-modal__field">
             <span>SSD de destino</span>
-            <select
+            <FancySelect
+              label="SSD de destino"
               value={driveId}
-              onChange={(e) => setDriveId(e.target.value)}
-              autoFocus
-            >
-              {drives.map((drive) => (
-                <option key={drive.id} value={drive.id}>
-                  {drive.isInternal ? `${drive.name} · interno` : drive.name}
-                </option>
-              ))}
-            </select>
+              onChange={setDriveId}
+              options={drives.map((drive) => ({
+                value: drive.id,
+                label: drive.isInternal
+                  ? `${drive.name} · interno`
+                  : drive.name,
+              }))}
+            />
           </label>
           <div className="wish-modal__actions">
             <button

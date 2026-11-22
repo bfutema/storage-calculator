@@ -2,6 +2,9 @@ import { useState, type FormEvent } from 'react'
 import type { Drive, Game, GameSource } from '../types'
 import { formatReleaseDate, formatSize, normalizeChronologyOrder, parseSizeInput } from '../utils/format'
 import { ArchiveIcon, EditIcon, TrashIcon } from './ActionIcons'
+import { DenuvoChip } from './DenuvoChip'
+import { FancyDatePicker } from './FancyDatePicker'
+import { FancySelect } from './FancySelect'
 import { WishDriveModal } from './WishDriveModal'
 import './GameList.css'
 
@@ -237,20 +240,19 @@ function DriveSelect({
   onSetDrive: (id: string, driveId: string) => void
 }) {
   return (
-    <label className="drive-select">
+    <div className="drive-select">
       <span className="visually-hidden">SSD de {game.name}</span>
-      <select
+      <FancySelect
+        label="SSD"
+        ariaLabel={`Mover ${game.name} para outro SSD`}
         value={game.driveId}
-        onChange={(e) => onSetDrive(game.id, e.target.value)}
-        aria-label={`Mover ${game.name} para outro SSD`}
-      >
-        {drives.map((drive) => (
-          <option key={drive.id} value={drive.id}>
-            {drive.isInternal ? `${drive.name} · interno` : drive.name}
-          </option>
-        ))}
-      </select>
-    </label>
+        onChange={(driveId) => onSetDrive(game.id, driveId)}
+        options={drives.map((drive) => ({
+          value: drive.id,
+          label: drive.isInternal ? `${drive.name} · interno` : drive.name,
+        }))}
+      />
+    </div>
   )
 }
 
@@ -264,20 +266,19 @@ function SourceSelect({
   onSetSource: (id: string, sourceId: string) => void
 }) {
   return (
-    <label className="drive-select source-select">
+    <div className="drive-select source-select">
       <span className="visually-hidden">Origem de {game.name}</span>
-      <select
+      <FancySelect
+        label="Origem"
+        ariaLabel={`Origem de ${game.name}`}
         value={game.sourceId}
-        onChange={(e) => onSetSource(game.id, e.target.value)}
-        aria-label={`Origem de ${game.name}`}
-      >
-        {sources.map((source) => (
-          <option key={source.id} value={source.id}>
-            {source.name}
-          </option>
-        ))}
-      </select>
-    </label>
+        onChange={(sourceId) => onSetSource(game.id, sourceId)}
+        options={sources.map((source) => ({
+          value: source.id,
+          label: source.name,
+        }))}
+      />
+    </div>
   )
 }
 
@@ -824,20 +825,19 @@ function GameEditor({
         />
         <span>GB</span>
       </div>
-      <label className="drive-select source-select">
+      <div className="drive-select source-select">
         <span className="visually-hidden">Origem</span>
-        <select
+        <FancySelect
+          label="Origem"
+          ariaLabel="Origem do jogo"
           value={sourceId}
-          onChange={(e) => onSourceChange(e.target.value)}
-          aria-label="Origem do jogo"
-        >
-          {sources.map((source) => (
-            <option key={source.id} value={source.id}>
-              {source.name}
-            </option>
-          ))}
-        </select>
-      </label>
+          onChange={onSourceChange}
+          options={sources.map((source) => ({
+            value: source.id,
+            label: source.name,
+          }))}
+        />
+      </div>
       <input
         type="text"
         list="game-edit-franchise-suggestions"
@@ -855,20 +855,18 @@ function GameEditor({
         placeholder="Ordem #"
         aria-label="Ordem cronológica"
       />
-      <input
-        type="date"
+      <FancyDatePicker
+        label="Lançamento"
+        ariaLabel="Data de lançamento"
         value={releaseDate}
-        onChange={(e) => onReleaseDateChange(e.target.value)}
-        aria-label="Data de lançamento"
+        onChange={onReleaseDateChange}
+        placeholder="dd/mm/aaaa"
       />
-      <label className="game-row__denuvo-edit">
-        <input
-          type="checkbox"
-          checked={hasDenuvo}
-          onChange={(e) => onHasDenuvoChange(e.target.checked)}
-        />
-        <span>Denuvo</span>
-      </label>
+      <DenuvoChip
+        compact
+        active={hasDenuvo}
+        onChange={onHasDenuvoChange}
+      />
       {franchiseSuggestions.length > 0 ? (
         <datalist id="game-edit-franchise-suggestions">
           {franchiseSuggestions.map((item) => (

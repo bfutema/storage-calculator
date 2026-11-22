@@ -5,6 +5,10 @@ import {
   type SizeUnit,
 } from '../types'
 import { parseSizeInput, normalizeChronologyOrder } from '../utils/format'
+import { DenuvoChip } from './DenuvoChip'
+import { FancyDatePicker } from './FancyDatePicker'
+import { FancySelect } from './FancySelect'
+import { SizeInput } from './SizeInput'
 import './GameForm.css'
 
 export interface GameFormValues {
@@ -52,7 +56,12 @@ export function GameForm({
   const [chronologyOrder, setChronologyOrder] = useState('')
   const [releaseDate, setReleaseDate] = useState('')
   const [hasDenuvo, setHasDenuvo] = useState(false)
+  const [detailsOpen, setDetailsOpen] = useState(false)
   const [error, setError] = useState('')
+
+  const hasExtraValues = Boolean(
+    franchise.trim() || chronologyOrder.trim() || releaseDate,
+  )
 
   function handleSubmit(event: FormEvent) {
     event.preventDefault()
@@ -104,6 +113,7 @@ export function GameForm({
     setChronologyOrder('')
     setReleaseDate('')
     setHasDenuvo(false)
+    setDetailsOpen(false)
     setSourceId(resolvedSourceId)
     setError('')
   }
@@ -126,90 +136,35 @@ export function GameForm({
           />
         </label>
 
-        <label className="field field--size">
-          <span>Tamanho</span>
-          <div className="size-row">
-            <input
-              type="text"
-              inputMode="decimal"
+        <div className="game-form__pair">
+          <label className="field field--size">
+            <span>Tamanho</span>
+            <SizeInput
               value={size}
-              onChange={(e) => setSize(e.target.value)}
-              placeholder="60"
+              unit={unit}
+              onValueChange={setSize}
+              onUnitChange={setUnit}
             />
-            <select
-              value={unit}
-              onChange={(e) => setUnit(e.target.value as SizeUnit)}
-              aria-label="Unidade"
-            >
-              <option value="MB">MB</option>
-              <option value="GB">GB</option>
-              <option value="TB">TB</option>
-            </select>
-          </div>
-        </label>
-
-        <label className="field">
-          <span>Origem</span>
-          <select
-            value={sourceId}
-            onChange={(e) => setSourceId(e.target.value)}
-          >
-            {sources.map((source) => (
-              <option key={source.id} value={source.id}>
-                {source.name}
-              </option>
-            ))}
-            {onAddSource ? (
-              <option value="__new__">+ Nova origem…</option>
-            ) : null}
-          </select>
-        </label>
-
-        <label className="field">
-          <span>Franquia</span>
-          <input
-            type="text"
-            list="game-franchise-suggestions"
-            value={franchise}
-            onChange={(e) => setFranchise(e.target.value)}
-            placeholder="Ex.: Assassin's Creed"
-            autoComplete="off"
-          />
-        </label>
-
-        <label className="field field--order">
-          <span>Ordem cronológica</span>
-          <input
-            type="text"
-            inputMode="decimal"
-            value={chronologyOrder}
-            onChange={(e) => setChronologyOrder(e.target.value)}
-            placeholder="1"
-            aria-label="Ordem cronológica na franquia"
-          />
-        </label>
-
-        <label className="field">
-          <span>Lançamento</span>
-          <input
-            type="date"
-            value={releaseDate}
-            onChange={(e) => setReleaseDate(e.target.value)}
-            aria-label="Data de lançamento"
-          />
-        </label>
-
-        <label className="field field--check">
-          <span>Denuvo</span>
-          <label className="check-row">
-            <input
-              type="checkbox"
-              checked={hasDenuvo}
-              onChange={(e) => setHasDenuvo(e.target.checked)}
-            />
-            <span>Proteção DRM presente</span>
           </label>
-        </label>
+
+          <label className="field field--source">
+            <span>Origem</span>
+            <FancySelect
+              label="Origem"
+              value={sourceId}
+              onChange={setSourceId}
+              options={[
+                ...sources.map((source) => ({
+                  value: source.id,
+                  label: source.name,
+                })),
+                ...(onAddSource
+                  ? [{ value: '__new__', label: '+ Nova origem…' }]
+                  : []),
+              ]}
+            />
+          </label>
+        </div>
 
         {sourceId === '__new__' ? (
           <label className="field field--span">
@@ -223,6 +178,61 @@ export function GameForm({
             />
           </label>
         ) : null}
+
+        <DenuvoChip active={hasDenuvo} onChange={setHasDenuvo} />
+
+        <div className={`game-form__details ${detailsOpen || hasExtraValues ? 'is-open' : ''}`}>
+          <button
+            type="button"
+            className="game-form__details-toggle"
+            aria-expanded={detailsOpen || hasExtraValues}
+            onClick={() => setDetailsOpen((open) => !open)}
+          >
+            <span>Detalhes opcionais</span>
+            <em>{detailsOpen || hasExtraValues ? 'Ocultar' : 'Franquia, ordem, data'}</em>
+          </button>
+
+          {detailsOpen || hasExtraValues ? (
+            <div className="game-form__details-body">
+              <label className="field">
+                <span>Franquia</span>
+                <input
+                  type="text"
+                  list="game-franchise-suggestions"
+                  value={franchise}
+                  onChange={(e) => setFranchise(e.target.value)}
+                  placeholder="Ex.: Assassin's Creed"
+                  autoComplete="off"
+                />
+              </label>
+
+              <div className="game-form__pair">
+                <label className="field field--order">
+                  <span>Ordem</span>
+                  <input
+                    type="text"
+                    inputMode="decimal"
+                    value={chronologyOrder}
+                    onChange={(e) => setChronologyOrder(e.target.value)}
+                    placeholder="1"
+                    aria-label="Ordem cronológica na franquia"
+                  />
+                </label>
+
+                <label className="field">
+                  <span>Lançamento</span>
+                  <FancyDatePicker
+                    label="Lançamento"
+                    ariaLabel="Data de lançamento"
+                    value={releaseDate}
+                    onChange={setReleaseDate}
+                    placeholder="dd/mm/aaaa"
+                  />
+                </label>
+              </div>
+            </div>
+          ) : null}
+        </div>
       </div>
 
       {franchiseSuggestions.length > 0 ? (

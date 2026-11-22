@@ -43,7 +43,7 @@
 
 .sort-btn {
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--surface-soft);
   color: var(--ink-soft);
   border-radius: 10px;
   padding: 0.4rem 0.85rem;
@@ -58,7 +58,7 @@
 }
 
 .sort-btn:hover {
-  border-color: rgba(22, 53, 42, 0.28);
+  border-color: var(--line-strong);
 }
 
 .sort-btn.is-active {
@@ -96,7 +96,7 @@
   align-items: center;
   gap: 0.65rem 0.75rem;
   padding: 0.85rem 0.15rem;
-  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+  border-bottom: 1px solid var(--divider);
   animation: row-in 0.4s ease both;
   min-width: 0;
 }
@@ -132,7 +132,7 @@
   height: 1.35rem;
   border: 1.5px solid var(--line);
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   transition: background 0.15s ease, border-color 0.15s ease,
     box-shadow 0.15s ease;
 }
@@ -140,7 +140,7 @@
 .game-row__count input:checked + .game-row__check {
   background: var(--ink);
   border-color: var(--ink);
-  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.15);
+  box-shadow: inset 0 0 0 2px var(--check-inset);
 }
 
 .game-row__count input:checked + .game-row__check::after {
@@ -226,7 +226,7 @@
 .game-row__edit input {
   width: 100%;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--surface-field);
   border-radius: 10px;
   padding: 0.7rem 0.85rem;
   font: inherit;
@@ -255,30 +255,25 @@
 .drive-select {
   display: block;
   min-width: 0;
+  max-width: 14rem;
 }
 
-.drive-select select {
-  width: 100%;
-  max-width: 14rem;
-  border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.65);
-  color: var(--ink);
-  border-radius: 10px;
-  padding: 0.45rem 0.65rem;
-  font: inherit;
+.drive-select .fancy-select__trigger {
+  padding: 0.5rem 0.7rem;
   font-size: 0.86rem;
-  font-weight: 600;
-  cursor: pointer;
+  border-radius: 10px;
+  background: var(--surface-field);
 }
 
 .game-row .drive-select {
   flex: 1 1 10rem;
   min-width: 0;
+  max-width: none;
 }
 
-.game-row .drive-select select {
-  max-width: none;
+.game-card .drive-select {
   width: 100%;
+  max-width: none;
 }
 
 .game-table-wrap {
@@ -295,7 +290,7 @@
 .game-table td {
   text-align: left;
   padding: 0.8rem 0.7rem;
-  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+  border-bottom: 1px solid var(--divider);
   vertical-align: middle;
 }
 
@@ -384,24 +379,6 @@
   background: color-mix(in srgb, var(--denuvo) 22%, transparent);
 }
 
-.game-row__denuvo-edit {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.35rem 0.55rem;
-  border: 1px solid var(--line);
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.4);
-  color: var(--ink-soft);
-  font-size: 0.9rem;
-  cursor: pointer;
-}
-
-.game-row__denuvo-edit input {
-  accent-color: var(--denuvo);
-  cursor: pointer;
-}
-
 .game-table__name {
   font-family: var(--font-display);
   font-weight: 650;
@@ -446,8 +423,8 @@
   min-width: 0;
   margin: 0;
   padding: 0.95rem 1rem 0.85rem;
-  background: rgba(255, 255, 255, 0.42);
-  border: 1.5px solid rgba(22, 53, 42, 0.1);
+  background: var(--surface-soft);
+  border: 1.5px solid var(--fill-strong);
   border-radius: 18px;
   overflow: hidden;
   animation: card-in 0.35s ease both;
@@ -456,12 +433,12 @@
 
 .game-card--counted {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 22%, rgba(255, 255, 255, 0.72));
+  background: color-mix(in srgb, var(--accent) 22%, var(--paper));
 }
 
 .game-card--wishlist {
   border-color: var(--wishlist);
-  background: color-mix(in srgb, var(--wishlist) 18%, rgba(255, 255, 255, 0.72));
+  background: color-mix(in srgb, var(--wishlist) 18%, var(--paper));
 }
 
 .game-row--wishlist .game-row__main strong,
@@ -508,14 +485,7 @@
   font-weight: 600;
 }
 
-.game-card .drive-select {
-  width: 100%;
-}
-
-.game-card .drive-select select {
-  width: 100%;
-  max-width: none;
-  box-sizing: border-box;
+.game-card .drive-select .fancy-select__trigger {
   font-size: 0.82rem;
   padding: 0.45rem 0.55rem;
 }

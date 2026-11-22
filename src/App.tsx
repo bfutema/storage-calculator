@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { SidebarIcon } from './components/ActionIcons'
+import { ThemeToggle } from './components/ThemeToggle'
 import { AddGameModal } from './components/AddGameModal'
 import { CapacitySetup } from './components/CapacitySetup'
 import { CollapsibleSection } from './components/CollapsibleSection'
@@ -90,7 +91,16 @@ function App() {
     }
   }, [focusMode])
 
-  const drawerVisible = focusMode && isCompactViewport && drawerOpen
+  const mobileHome = isCompactViewport && !focusMode
+  const drawerVisible = isCompactViewport && drawerOpen
+  const quickAdd = focusMode || isCompactViewport
+  const franchiseSuggestions = [
+    ...new Set(
+      state.games
+        .map((game) => game.franchise?.trim())
+        .filter((name): name is string => Boolean(name)),
+    ),
+  ].sort((a, b) => a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }))
 
   const library = (
     <GameLibrary
@@ -117,14 +127,14 @@ function App() {
       onRemove={removeGame}
       onClear={clearGames}
       onClearArchived={clearArchivedGames}
-      hideForm={focusMode}
-      fillViewport={focusMode}
+      hideForm={quickAdd}
+      fillViewport={focusMode || mobileHome}
     />
   )
 
   const hint = (
     <div
-      className={`hint ${breakdown.isOverCapacity ? 'hint--warn' : ''} ${focusMode ? 'hint--compact' : ''}`}
+      className={`hint ${breakdown.isOverCapacity ? 'hint--warn' : ''} ${focusMode || mobileHome ? 'hint--compact' : ''}`}
       role="status"
     >
       {breakdown.isOverCapacity ? (
@@ -248,6 +258,7 @@ function App() {
       className={[
         'app',
         focusMode ? 'app--focus' : '',
+        mobileHome ? 'app--mobile' : '',
         drawerVisible ? 'app--drawer' : '',
       ]
         .filter(Boolean)
@@ -283,18 +294,21 @@ function App() {
                 <div className="focus-bar__drives">{focusDrives}</div>
               </>
             )}
-            <button
-              type="button"
-              className="mode-toggle is-active"
-              onClick={() => {
-                setAddOpen(false)
-                setDrawerOpen(false)
-                setFocusMode(false)
-              }}
-              aria-pressed="true"
-            >
-              {isCompactViewport ? 'Sair' : 'Sair do modo foco'}
-            </button>
+            <div className="focus-bar__actions">
+              <ThemeToggle />
+              <button
+                type="button"
+                className="mode-toggle is-active"
+                onClick={() => {
+                  setAddOpen(false)
+                  setDrawerOpen(false)
+                  setFocusMode(false)
+                }}
+                aria-pressed="true"
+              >
+                {isCompactViewport ? 'Sair' : 'Sair do modo foco'}
+              </button>
+            </div>
           </header>
 
           <main className="focus-layout">
@@ -315,53 +329,69 @@ function App() {
               {focusStats}
             </FocusDrawer>
           ) : null}
+        </>
+      ) : mobileHome ? (
+        <>
+          <header className="mobile-shell">
+            <div className="mobile-shell__top">
+              <p className="mobile-shell__brand">Storage</p>
+              <div className="mobile-shell__actions">
+                <ThemeToggle />
+                <button
+                  type="button"
+                  className="mode-toggle"
+                  onClick={() => {
+                    setDrawerOpen(false)
+                    setFocusMode(true)
+                  }}
+                  aria-pressed="false"
+                >
+                  Foco
+                </button>
+              </div>
+            </div>
 
-          <button
-            type="button"
-            className="fab"
-            onClick={() => setAddOpen(true)}
-            aria-haspopup="dialog"
-            aria-expanded={addOpen}
+            <button
+              type="button"
+              className={`storage-pulse ${breakdown.isOverCapacity ? 'is-over' : ''}`}
+              onClick={() => setDrawerOpen(true)}
+              aria-haspopup="dialog"
+              aria-expanded={drawerVisible}
+            >
+              <span
+                className="storage-pulse__meter"
+                aria-hidden="true"
+                style={{
+                  ['--pulse-angle' as string]: `${Math.min(Math.max(breakdown.usedPercent, 0), 100)}%`,
+                }}
+              >
+                <strong>
+                  {Math.round(Math.min(breakdown.usedPercent, 999))}
+                  <small>%</small>
+                </strong>
+              </span>
+              <span className="storage-pulse__copy">
+                <strong>{breakdown.driveName}</strong>
+                <em>
+                  {formatSize(breakdown.usedGb)} em uso ·{' '}
+                  {formatSize(Math.abs(breakdown.freeGb))}{' '}
+                  {breakdown.isOverCapacity ? 'faltando' : 'livre'}
+                </em>
+              </span>
+              <span className="storage-pulse__action">Ajustar</span>
+            </button>
+          </header>
+
+          <section className="panel panel--mobile-library">{library}</section>
+
+          <FocusDrawer
+            open={drawerVisible}
+            title="Armazenamento"
+            onClose={() => setDrawerOpen(false)}
           >
-            <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
-              <path
-                d="M11 4v14M4 11h14"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2.4"
-                strokeLinecap="round"
-              />
-            </svg>
-            <span>Adicionar jogo</span>
-          </button>
-
-          <AddGameModal
-            open={addOpen}
-            onClose={() => setAddOpen(false)}
-            sources={state.sources}
-            franchiseSuggestions={[
-              ...new Set(
-                state.games
-                  .map((game) => game.franchise?.trim())
-                  .filter((name): name is string => Boolean(name)),
-              ),
-            ].sort((a, b) =>
-              a.localeCompare(b, 'pt-BR', { sensitivity: 'base' }),
-            )}
-            onAdd={(values) =>
-              addGame(
-                values.name,
-                values.sizeGb,
-                effectiveDriveId,
-                values.sourceId,
-                values.franchise,
-                values.releaseDate,
-                values.chronologyOrder,
-                values.hasDenuvo,
-              )
-            }
-            onAddSource={addSource}
-          />
+            {focusDrives}
+            {focusStats}
+          </FocusDrawer>
         </>
       ) : (
         <>
@@ -372,14 +402,17 @@ function App() {
               Organize o SSD interno do Ally e os externos de backup. Mova cada
               jogo para o disco certo e veja se cabe — antes de transferir.
             </p>
-            <button
-              type="button"
-              className="mode-toggle"
-              onClick={() => setFocusMode(true)}
-              aria-pressed="false"
-            >
-              Entrar no modo foco
-            </button>
+            <div className="hero__actions">
+              <ThemeToggle />
+              <button
+                type="button"
+                className="mode-toggle"
+                onClick={() => setFocusMode(true)}
+                aria-pressed="false"
+              >
+                Entrar no modo foco
+              </button>
+            </div>
           </header>
 
           <main className="layout">
@@ -474,6 +507,47 @@ function App() {
           </footer>
         </>
       )}
+
+      {quickAdd ? (
+        <button
+          type="button"
+          className="fab"
+          onClick={() => setAddOpen(true)}
+          aria-haspopup="dialog"
+          aria-expanded={addOpen}
+          aria-label="Adicionar jogo"
+        >
+          <svg width="22" height="22" viewBox="0 0 22 22" aria-hidden="true">
+            <path
+              d="M11 4v14M4 11h14"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.4"
+              strokeLinecap="round"
+            />
+          </svg>
+        </button>
+      ) : null}
+
+      <AddGameModal
+        open={addOpen}
+        onClose={() => setAddOpen(false)}
+        sources={state.sources}
+        franchiseSuggestions={franchiseSuggestions}
+        onAdd={(values) =>
+          addGame(
+            values.name,
+            values.sizeGb,
+            effectiveDriveId,
+            values.sourceId,
+            values.franchise,
+            values.releaseDate,
+            values.chronologyOrder,
+            values.hasDenuvo,
+          )
+        }
+        onAddSource={addSource}
+      />
     </div>
   )
 }

@@ -18,7 +18,7 @@
 .capacity .field input {
   width: 100%;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   color: var(--ink);
   border-radius: 12px;
   padding: 0.85rem 1rem;
@@ -29,8 +29,8 @@
 
 .capacity .field input:focus {
   border-color: var(--accent);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 3px rgba(140, 214, 80, 0.25);
+  background: var(--surface-strong);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .capacity__block {
@@ -54,7 +54,7 @@
 .chip {
   appearance: none;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--surface-soft);
   color: var(--ink-soft);
   border-radius: 999px;
   padding: 0.55rem 0.95rem;
@@ -67,7 +67,7 @@
 }
 
 .chip:hover {
-  border-color: rgba(22, 53, 42, 0.28);
+  border-color: var(--line-strong);
   transform: translateY(-1px);
 }
 
@@ -87,8 +87,8 @@
   gap: 0.9rem;
   padding: 1rem;
   border-radius: 16px;
-  background: rgba(22, 53, 42, 0.05);
-  border: 1px solid rgba(22, 53, 42, 0.08);
+  background: var(--fill);
+  border: 1px solid var(--divider);
 }
 
 .toggle {
@@ -111,7 +111,7 @@
   margin-top: 0.1rem;
   border: 1.5px solid var(--line);
   border-radius: 6px;
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   position: relative;
 }
 
@@ -231,8 +231,8 @@
   gap: 0.55rem;
   padding: 0.85rem 0.9rem;
   border-radius: 14px;
-  background: rgba(196, 135, 58, 0.1);
-  border: 1px solid rgba(196, 135, 58, 0.22);
+  background: var(--warn-soft);
+  border: 1px solid var(--warn-line);
 }
 
 .capacity--compact .capacity__calibration {

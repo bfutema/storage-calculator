@@ -46,7 +46,7 @@
   appearance: none;
   flex-shrink: 0;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   color: var(--ink);
   border-radius: 999px;
   padding: 0.5rem 0.9rem;
@@ -74,7 +74,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 0.75rem 0.15rem;
-  border-bottom: 1px solid rgba(22, 53, 42, 0.08);
+  border-bottom: 1px solid var(--divider);
 }
 
 .archive-list__item > div:first-child {
@@ -96,13 +96,13 @@
 
 .library__tools-btn:hover,
 .library__tools-btn.is-active {
-  border-color: rgba(22, 53, 42, 0.28);
-  background: rgba(255, 255, 255, 0.9);
+  border-color: var(--line-strong);
+  background: var(--surface-strong);
 }
 
 .library__tools-btn.has-filters {
   border-color: var(--accent);
-  background: color-mix(in srgb, var(--accent) 18%, rgba(255, 255, 255, 0.7));
+  background: color-mix(in srgb, var(--accent) 18%, var(--paper));
 }
 
 .library__tools-btn em {
@@ -171,7 +171,7 @@
 .library__search input {
   width: 100%;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   color: var(--ink);
   border-radius: 12px;
   padding: 0.8rem 1rem;
@@ -183,8 +183,8 @@
 
 .library__search input:focus {
   border-color: var(--accent);
-  background: rgba(255, 255, 255, 0.9);
-  box-shadow: 0 0 0 3px rgba(140, 214, 80, 0.25);
+  background: var(--surface-strong);
+  box-shadow: 0 0 0 3px var(--focus-ring);
 }
 
 .view-toggle {
@@ -193,7 +193,7 @@
   border: 1px solid var(--line);
   border-radius: 12px;
   overflow: hidden;
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--surface-soft);
 }
 
 .view-toggle button {
@@ -214,7 +214,7 @@
 }
 
 .view-toggle button:hover {
-  background: rgba(22, 53, 42, 0.06);
+  background: var(--fill-hover);
 }
 
 .view-toggle button.is-active {
@@ -251,7 +251,7 @@
 .filter-chip {
   appearance: none;
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.4);
+  background: var(--surface-soft);
   color: var(--ink-soft);
   border-radius: 10px;
   padding: 0.38rem 0.75rem;
@@ -263,7 +263,7 @@
 }
 
 .filter-chip:hover {
-  border-color: rgba(22, 53, 42, 0.28);
+  border-color: var(--line-strong);
 }
 
 .filter-chip.is-active {
@@ -328,8 +328,8 @@
   gap: 0.5rem;
   padding: 0.45rem 0.55rem;
   border-radius: 10px;
-  background: rgba(22, 53, 42, 0.05);
-  border: 1px solid rgba(22, 53, 42, 0.08);
+  background: var(--fill);
+  border: 1px solid var(--divider);
   font-size: 0.9rem;
   font-weight: 600;
 }
@@ -355,14 +355,19 @@
   color: var(--muted);
 }
 
-.library__move select,
 .library__move input {
   border: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.55);
+  background: var(--surface);
   color: var(--ink);
   border-radius: 10px;
   padding: 0.55rem 0.75rem;
   font: inherit;
+  font-weight: 600;
+}
+
+.library__move .fancy-select__trigger {
+  padding: 0.55rem 0.75rem;
+  border-radius: 10px;
   font-weight: 600;
 }
 
@@ -452,7 +457,7 @@
   z-index: 45;
   display: flex;
   justify-content: flex-end;
-  background: rgba(18, 40, 32, 0.35);
+  background: var(--overlay);
   backdrop-filter: blur(6px);
 }
 
@@ -461,13 +466,9 @@
   height: 100%;
   display: flex;
   flex-direction: column;
-  background: linear-gradient(
-    165deg,
-    rgba(255, 255, 255, 0.96),
-    rgba(238, 244, 238, 0.94)
-  );
-  border-left: 1px solid rgba(255, 255, 255, 0.7);
-  box-shadow: -18px 0 48px rgba(18, 40, 32, 0.18);
+  background: linear-gradient(165deg, var(--sheet-start), var(--sheet-end));
+  border-left: 1px solid var(--sheet-border);
+  box-shadow: -18px 0 48px var(--shadow);
   animation: drawer-in 0.22s ease both;
 }
 
@@ -477,7 +478,7 @@
   justify-content: space-between;
   gap: 0.75rem;
   padding: 1rem 1.1rem;
-  border-bottom: 1px solid rgba(22, 53, 42, 0.1);
+  border-bottom: 1px solid var(--divider);
   flex-shrink: 0;
 }
 

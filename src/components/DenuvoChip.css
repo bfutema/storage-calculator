@@ -1,0 +1,161 @@
+.denuvo-chip {
+  appearance: none;
+  width: 100%;
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr) auto;
+  align-items: center;
+  gap: 0.75rem;
+  border: 1px solid color-mix(in srgb, var(--denuvo) 28%, var(--line));
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--denuvo) 10%, transparent),
+      transparent 55%
+    ),
+    var(--surface-soft);
+  color: var(--ink);
+  border-radius: 16px;
+  padding: 0.7rem 0.8rem;
+  text-align: left;
+  cursor: pointer;
+  transition:
+    border-color 0.2s ease,
+    background 0.2s ease,
+    transform 0.15s ease,
+    box-shadow 0.2s ease;
+}
+
+.denuvo-chip:hover {
+  border-color: color-mix(in srgb, var(--denuvo) 48%, var(--line));
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--denuvo) 16%, transparent),
+      transparent 55%
+    ),
+    var(--surface);
+}
+
+.denuvo-chip:active {
+  transform: scale(0.99);
+}
+
+.denuvo-chip.is-active {
+  border-color: color-mix(in srgb, var(--denuvo) 70%, transparent);
+  background:
+    linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--denuvo) 28%, transparent),
+      color-mix(in srgb, var(--denuvo) 8%, transparent)
+    ),
+    var(--surface);
+  box-shadow: 0 10px 24px color-mix(in srgb, var(--denuvo) 18%, transparent);
+}
+
+.denuvo-chip__mark {
+  width: 2.15rem;
+  height: 2.15rem;
+  border-radius: 11px;
+  display: grid;
+  place-items: center;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  color: var(--denuvo-ink);
+  background: color-mix(in srgb, var(--denuvo) 24%, transparent);
+}
+
+.denuvo-chip.is-active .denuvo-chip__mark {
+  color: var(--paper);
+  background: var(--denuvo);
+}
+
+.denuvo-chip__copy {
+  display: grid;
+  gap: 0.1rem;
+  min-width: 0;
+}
+
+.denuvo-chip__copy strong {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.denuvo-chip__copy em {
+  font-style: normal;
+  font-size: 0.78rem;
+  color: var(--muted);
+}
+
+.denuvo-chip.is-active .denuvo-chip__copy em {
+  color: var(--denuvo-ink);
+}
+
+.denuvo-chip__switch {
+  width: 2.45rem;
+  height: 1.4rem;
+  border-radius: 999px;
+  background: var(--fill-strong);
+  position: relative;
+  flex-shrink: 0;
+  transition: background 0.2s ease;
+}
+
+.denuvo-chip__switch i {
+  position: absolute;
+  top: 0.16rem;
+  left: 0.16rem;
+  width: 1.08rem;
+  height: 1.08rem;
+  border-radius: 50%;
+  background: var(--paper);
+  box-shadow: 0 2px 6px var(--shadow);
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.denuvo-chip.is-active .denuvo-chip__switch {
+  background: color-mix(in srgb, var(--denuvo) 72%, #000);
+}
+
+.denuvo-chip.is-active .denuvo-chip__switch i {
+  transform: translateX(1.05rem);
+  background: #fff7ef;
+}
+
+.denuvo-chip--compact {
+  padding: 0.55rem 0.65rem;
+  border-radius: 14px;
+  gap: 0.55rem;
+}
+
+.denuvo-chip--compact .denuvo-chip__mark {
+  width: 1.85rem;
+  height: 1.85rem;
+  border-radius: 9px;
+  font-size: 0.82rem;
+}
+
+.denuvo-chip--compact .denuvo-chip__copy strong {
+  font-size: 0.86rem;
+}
+
+.denuvo-chip--compact .denuvo-chip__copy em {
+  font-size: 0.72rem;
+}
+
+.denuvo-chip--compact .denuvo-chip__switch {
+  width: 2.15rem;
+  height: 1.25rem;
+}
+
+.denuvo-chip--compact .denuvo-chip__switch i {
+  width: 0.95rem;
+  height: 0.95rem;
+}
+
+.denuvo-chip--compact.is-active .denuvo-chip__switch i {
+  transform: translateX(0.9rem);
+}
